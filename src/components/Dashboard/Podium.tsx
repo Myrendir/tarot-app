@@ -1,29 +1,72 @@
 import React from "react";
 import '../podium.css';
 
-const Podium = (players: any) => {
-    players = players.players;
+type PlayerPodium = {
+    firstname: string,
+    lastname: string,
+    [key: string]: any
+}
 
-    const getFullName = (player: any) => {
-        return `${player.playerFirstname} ${player.playerLastname.charAt(0).toUpperCase()}.`;
+type PodiumProps = {
+    players: PlayerPodium[],
+    dataKey: string,
+    percentage?: boolean
+}
+
+const Podium = ({players, dataKey, percentage}: PodiumProps) => {
+
+    const getFullName = (player: PlayerPodium) => {
+        return `${player.firstname} ${player.lastname.charAt(0).toUpperCase()}.`;
     }
 
-    const getValue = (player: any) => {
-      return player.count ? player.count : player.totalPoints;
+    const getEqualScoreIndices = (players: PlayerPodium[], key: string): number[] => {
+        const scores = players.map(player => player[key]);
+        const scoreOccurrences: { [key: number]: number[] } = {};
+
+        scores.forEach((score, index) => {
+            if (!scoreOccurrences[score]) {
+                scoreOccurrences[score] = [];
+            }
+            scoreOccurrences[score].push(index);
+        });
+
+        return Object.values(scoreOccurrences)
+            .filter(indices => indices.length > 1)
+            .flat();
     }
+
+
+    const getStep = (indices: number[], defaultStep: number, playerIndex: number): number => {
+        if (indices.length === 2) {
+            if (indices.includes(0) && indices.includes(1) && indices.includes(playerIndex)) {
+                return 1;
+            }
+            if (indices.includes(1) && indices.includes(2) && indices.includes(playerIndex)) {
+                return 2;
+            }
+        }
+
+        if (indices.length === 3) {
+            return 1;
+        }
+        return defaultStep
+
+    }
+
     return (
+
         <div className="podium">
-            <div className="podium-2">
+            <div className={`podium-${getStep(getEqualScoreIndices(players, dataKey), 2, 1)}`}>
                 <span className="podium-name">{players[1] && getFullName(players[1])}</span>
-                {getValue(players[1])}
+                {percentage ? `${players[1][dataKey]}% (${players[1].totalGames})` : players[1][dataKey]}
             </div>
-            <div className="podium-1">
+            <div className={`podium-${getStep(getEqualScoreIndices(players, dataKey), 1, 0)}`}>
                 <span className="podium-name">{players[0] && getFullName(players[0])}</span>
-                {getValue(players[0])}
+                {percentage ? `${players[0][dataKey]}% (${players[0].totalGames})` : players[0][dataKey]}
             </div>
-            <div className="podium-3">
+            <div className={`podium-${getStep(getEqualScoreIndices(players, dataKey), 3, 2)}`}>
                 <span className="podium-name">{players[2] && getFullName(players[2])}</span>
-                {getValue(players[2])}
+                {percentage ? `${players[2][dataKey]}% (${players[2].totalGames})` : players[2][dataKey]}
             </div>
         </div>
     )

@@ -75,7 +75,7 @@ const AddSession: React.FC = () => {
 
     const getSessionResume = (session: Session) => {
 
-        const players = session.players.map((p: SessionPlayer) => p.player.username).join(', ');
+        const players = session.players.map((p: SessionPlayer) => p.player.firstname + ' ' + p.player.lastname.charAt(0).toUpperCase()).join(', ');
         const games = `${session.games.length} ${session.games.length > 1 ? 'parties' : 'partie'}`;
         return (
             <div>

@@ -87,6 +87,7 @@ const SessionDetail: React.FC = () => {
         // eslint-disable-next-line
     }, [id]);
 
+    console.log(session?.players);
     const handleReset = () => {
         setBet('');
         setTaker('');
@@ -211,7 +212,7 @@ const SessionDetail: React.FC = () => {
                         <tr key={player.player._id}>
                             <td className={'d-flex'} style={{justifyContent: 'space-between'}}>
                                 <div>
-                                    {player.player.username}
+                                    {player.player.firstname + ' ' + player.player.lastname.charAt(0).toUpperCase() + '.'}
                                 </div>
                                 {
                                     session?.games.length > 0 && (
@@ -353,9 +354,11 @@ const SessionDetail: React.FC = () => {
 
                         <div>
                             <label>Score de l'attaque :</label>
+
                             <input
                                 className="form-control"
                                 min={0}
+                                step={0.5}
                                 type="number"
                                 value={attackingTeamScore}
                                 onChange={(e) => handleAttackingScoreChange(Number(e.target.value))}
@@ -367,6 +370,7 @@ const SessionDetail: React.FC = () => {
                             <input
                                 className="form-control"
                                 min={0}
+                                step={0.5}
                                 type="number"
                                 value={defendingTeamScore}
                                 onChange={(e) => handleDefendingScoreChange(Number(e.target.value))}

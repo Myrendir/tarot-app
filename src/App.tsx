@@ -16,7 +16,7 @@ function App() {
                 <div>
                     <Routes>
                         <Route path="/" element={<HomePage/>}/>
-                        <Route path="/addSession" element={<AddSession/>}/>
+                        <Route path="/session" element={<AddSession/>}/>
                         <Route path="/session/:id" element={<SessionDetail/>}/>
                         <Route path="/profil" element={<RankingPage/>}/>
                     </Routes>
