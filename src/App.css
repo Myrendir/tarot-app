@@ -36,3 +36,42 @@
     transform: rotate(360deg);
   }
 }
+
+.container {
+  padding: 10px;
+  max-width: 100%;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+button {
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+
+
+
+@media (min-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+}
+@media (min-width: 1024px) {
+  .container {
+    padding: 30px;
+    max-width: 800px;
+    margin: auto;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
