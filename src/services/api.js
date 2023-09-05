@@ -4,8 +4,9 @@ import {store} from '../store/index';
 const state = store.getState();
 const token = state.token.value;
 
+const baseURL = process.env.REACT_APP_API_URL;
 const instance = axios.create({
-    baseURL: 'http://192.168.10.126:3000/api',
+    baseURL: `${baseURL}/api`,
     headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + token,
