@@ -14,6 +14,7 @@ const HomePage = () => {
     const [mostGamesCalled, setMostGamesCalled] = useState<any>([]);
     const [mostPointsCumulated, setMostPointsCumulated] = useState<any>([]);
     const [topWinrate, setTopWinrate] = useState<any>([]);
+    const [topAveragePoints, setTopAveragePoints] = useState<any>([]);
     const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
         api.get('/stats/gamesTaken')
@@ -44,6 +45,12 @@ const HomePage = () => {
             }).catch(error => {
             console.error("Error fetching top winrate:", error);
         })
+        api.get('/stats/bestAveragePointsPerGame')
+            .then(response => {
+                setTopAveragePoints(response.data);
+            }).catch(error => {
+            console.error("Error fetching top average points:", error);
+        })
         setIsLoading(false);
     }, []);
 
@@ -64,8 +71,14 @@ const HomePage = () => {
                                                           dataKey={'totalPoints'}/>}
                                         title={'Top points cumulés'}/> : null}
                             {topWinrate.length > 0 ?
-                                <Widget children={<Podium players={topWinrate.slice(0, 3)} dataKey={'winPercentage'} percentage={true}/>}
-                                        title={'Top winrate'}/> : null}
+                                <Widget children={<Podium players={topWinrate.slice(0, 3)} dataKey={'winPercentage'}
+                                                          percentage={true}/>}
+                                        title={'Top winrate preneurs'}/> : null}
+                            {topAveragePoints.length > 0 ?
+                                <Widget children={<Podium players={topAveragePoints.slice(0, 3)}
+                                                          dataKey={'averagePoints'}/>}
+                                        title={'Top moyenne de points par partie'}/> : null}
+
                         </div>
                         <div className="text-center pb-3">
                             <Link className="btn btn-primary rounded-pill" to={"/session"}>Enregistrer des

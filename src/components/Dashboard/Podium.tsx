@@ -49,8 +49,8 @@ const Podium = ({players, dataKey, percentage}: PodiumProps) => {
         if (indices.length === 3) {
             return 1;
         }
-        return defaultStep
 
+        return defaultStep
     }
 
     return (

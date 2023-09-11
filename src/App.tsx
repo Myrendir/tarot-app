@@ -18,7 +18,7 @@ function App() {
                         <Route path="/" element={<HomePage/>}/>
                         <Route path="/session" element={<AddSession/>}/>
                         <Route path="/session/:id" element={<SessionDetail/>}/>
-                        <Route path="/profil" element={<RankingPage/>}/>
+                        <Route path="/stats" element={<RankingPage/>}/>
                     </Routes>
                 </div>
             </Router>

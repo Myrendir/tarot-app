@@ -15,6 +15,7 @@ import MobileLayout from "../../Layout/MobileLayout";
 import {toastr} from "react-redux-toastr";
 import {Session, SessionPlayer} from "../../model/Session";
 import Loading from "../Loading";
+import SelectPlayerComponent from "./SelectPlayerComponent";
 
 const AddSession: React.FC = () => {
     const dispatch = useDispatch();
@@ -176,22 +177,15 @@ const AddSession: React.FC = () => {
             <div className='container mt-4'>
                 <h1 className="text-center mb-4">Choix de la session</h1>
                 <form onSubmit={handleSubmit}>
-                    {formData.players.map((selectedPlayer, index) => (
-                        <Select
+                    {formData.players.map((selectedPlayer, index: number) => (
+                        <SelectPlayerComponent
                             key={index}
-                            name={`player${index}`}
-                            placeholder={"Sélectionner un joueur"}
-                            value={selectOptions.find(option => option.value === selectedPlayer)}
-                            options={selectOptions.filter(
-                                option => !formData.players.includes(option.value) || option.value === selectedPlayer
-                            )}
-                            className="mb-3"
-                            onChange={(selectedOption) => {
-                                const newPlayers = [...formData.players];
-                                newPlayers[index] = selectedOption?.value;
-                                setFormData({...formData, players: newPlayers});
-                            }}
-                        />
+                            index={index}
+                            selectedPlayer={selectedPlayer}
+                            formData={formData}
+                            setFormData={setFormData}
+                            selectOptions={selectOptions}
+                         />
                     ))}
 
                     <div className="d-flex justify-content-center pt-3">

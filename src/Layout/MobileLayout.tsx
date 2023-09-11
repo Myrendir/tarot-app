@@ -32,7 +32,7 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({children}) => {
                     <Link className="nav-link" to="/session"><FontAwesomeIcon icon={faClipboard}
                                                                                  size="lg"
                                                                                  className={getSelectedColor(location.pathname, ['/session', '/session/'])}/></Link>
-                    <Link className="nav-link" to="/profil"><FontAwesomeIcon icon={faTrophy}
+                    <Link className="nav-link" to="/stats"><FontAwesomeIcon icon={faTrophy}
                                                                              size="lg"
                                                                              className={getSelectedColor(location.pathname, ['/profil'])}/></Link>
                 </div>
