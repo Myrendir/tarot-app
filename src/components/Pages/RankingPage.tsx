@@ -150,14 +150,13 @@ const RankingPage = () => {
                                             </div>
                                         </div>
 
-
                                         {
                                             playerStats.bets ?
                                                 <div className={"card mt-2 mb-3 d-flex flex-row"}>
                                                     {playerStats.bets.map((bet: any) => (
                                                         <div className="card-body d-flex flex-column">
                                                             <h6 className="card-title">{getBetLabel(bet.bet)}</h6>
-                                                            <p className="card-text ">{bet.percentage} %</p>
+                                                            <p className="card-text ">{bet.percentage}%</p>
                                                         </div>
                                                     ))}
                                                 </div> : null

@@ -15,6 +15,7 @@ const HomePage = () => {
     const [mostPointsCumulated, setMostPointsCumulated] = useState<any>([]);
     const [topWinrate, setTopWinrate] = useState<any>([]);
     const [topAveragePoints, setTopAveragePoints] = useState<any>([]);
+    const [topGWinrate, setTopGWinrate] = useState<any>([]);
     const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
         api.get('/stats/gamesTaken')
@@ -51,6 +52,13 @@ const HomePage = () => {
             }).catch(error => {
             console.error("Error fetching top average points:", error);
         })
+        api.get('/stats/mostWinrateForBet/g')
+            .then(response => {
+                setTopGWinrate(response.data);
+            })
+            .catch(error => {
+                console.error("Error fetching top g winrate:", error);
+            });
         setIsLoading(false);
     }, []);
 
@@ -78,6 +86,11 @@ const HomePage = () => {
                                 <Widget children={<Podium players={topAveragePoints.slice(0, 3)}
                                                           dataKey={'averagePoints'}/>}
                                         title={'Top moyenne de points par partie'}/> : null}
+                            {topGWinrate.length > 0 ?
+                                <Widget children={<Podium players={topGWinrate.slice(0, 3)} dataKey={'winrate'}
+                                                          percentage={true}/>}
+                                        title={'Top winrate garde'}/> : null}
+
 
                         </div>
                         <div className="text-center pb-3">
