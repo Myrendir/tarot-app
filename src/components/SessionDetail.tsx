@@ -324,7 +324,7 @@ const SessionDetail: React.FC = () => {
                                 {session?.players.map(player => (
                                     (player.player._id !== partner) &&
                                     <option key={player.player._id}
-                                            value={player.player._id}>{player.player.username}</option>
+                                            value={player.player._id}>{`${player.player.firstname} ${player.player.lastname.charAt(0).toUpperCase()}.`}</option>
                                 ))}
                             </select>
                         </div>
@@ -338,7 +338,7 @@ const SessionDetail: React.FC = () => {
                                 {session?.players.map(player => (
                                     (player.player._id !== taker) &&
                                     <option key={player.player._id}
-                                            value={player.player._id}>{player.player.username}</option>
+                                            value={player.player._id}>{`${player.player.firstname} ${player.player.lastname.charAt(0).toUpperCase()}.`}</option>
                                 ))}
                             </select>
                         </div>

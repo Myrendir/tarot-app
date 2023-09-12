@@ -4,7 +4,6 @@ import SelectPlayerComponent from "../Form/SelectPlayerComponent";
 import api from "../../services/api";
 import Loading from "../Loading";
 import {Player} from "../../model/Player";
-import {BET} from "../../model/Game";
 
 const RankingPage = () => {
     const [players, setPlayers] = useState<any>([]);

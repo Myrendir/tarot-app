@@ -9,7 +9,6 @@ import {
 import {RootState} from "../../store";
 import {playerError, playersReceived, startLoadingPlayers} from "../../store/playerSlice";
 import api from "../../services/api";
-import Select from "react-select";
 import {Link, useNavigate} from 'react-router-dom';
 import MobileLayout from "../../Layout/MobileLayout";
 import {toastr} from "react-redux-toastr";

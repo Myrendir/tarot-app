@@ -1,8 +1,4 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import api from "../services/api";
-import {SessionPlayer} from "../model/Session";
-import React from "react";
-import {Session} from "../model/Session";
 
 interface SessionState {
     sessions: any[];
