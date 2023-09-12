@@ -16,7 +16,9 @@ const SelectPlayerComponent = ({index, selectedPlayer, formData, setFormData, se
             placeholder={"Sélectionner un joueur"}
             value={selectOptions.find((option: { value: string | null; }) => option.value === selectedPlayer)}
             options={selectOptions.filter(
-                (option: { value: string | null; }) => !formData.players.includes(option.value) || option.value === selectedPlayer
+                (option: {
+                    value: string | null;
+                }) => !formData.players.includes(option.value) || option.value === selectedPlayer
             )}
             className="mb-3"
             onChange={(selectedOption: { value: any; }) => {
@@ -24,6 +26,7 @@ const SelectPlayerComponent = ({index, selectedPlayer, formData, setFormData, se
                 newPlayers[index] = selectedOption?.value;
                 setFormData({...formData, players: newPlayers});
             }}
+            isClearable={true}
         />
     )
 }
