@@ -58,15 +58,18 @@ const Podium = ({players, dataKey, percentage}: PodiumProps) => {
         <div className="podium">
             <div className={`podium-${getStep(getEqualScoreIndices(players, dataKey), 2, 1)}`}>
                 <span className="podium-name">{players[1] && getFullName(players[1])}</span>
-                {percentage ? `${players[1][dataKey].toFixed(2)}% (${players[1].totalGames})` : players[1][dataKey]}
+                {percentage ? `${players[1][dataKey].toFixed(2)}% ` : (Math.round(players[1][dataKey]))}
+                {(players[1].totalGames ? ` (${players[1].totalGames})` : null)}
             </div>
             <div className={`podium-${getStep(getEqualScoreIndices(players, dataKey), 1, 0)}`}>
                 <span className="podium-name">{players[0] && getFullName(players[0])}</span>
-                {percentage ? `${players[0][dataKey].toFixed(2)}% (${players[0].totalGames})` : players[0][dataKey]}
+                {percentage ? `${players[0][dataKey].toFixed(2)}% ` : (Math.round(players[0][dataKey]))}
+                {(players[0].totalGames ? ` (${players[0].totalGames})` : null)}
             </div>
             <div className={`podium-${getStep(getEqualScoreIndices(players, dataKey), 3, 2)}`}>
                 <span className="podium-name">{players[2] && getFullName(players[2])}</span>
-                {percentage ? `${players[2][dataKey].toFixed(2)}% (${players[2].totalGames})` : players[2][dataKey]}
+                {percentage ? `${players[2][dataKey].toFixed(2)}% ` : (Math.round(players[2][dataKey]))}
+                {(players[2].totalGames ? ` (${players[2].totalGames})` : null)}
             </div>
         </div>
     )
