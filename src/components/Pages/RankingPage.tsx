@@ -37,6 +37,10 @@ const RankingPage = () => {
                 })
                 .catch(error => {
                     console.error("Error fetching player stats:", error);
+                    setFormData({
+                        ...formData,
+                        players: Array(1).fill(null),
+                    })
                 })
         }
         setIsLoading(false);
@@ -73,6 +77,7 @@ const RankingPage = () => {
             return 'text-dark';
         }
     }
+
     return (
         <MobileLayout>
             {
@@ -144,17 +149,19 @@ const RankingPage = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className={"card mt-2 mb-3 d-flex flex-row"}>
 
-                                            {
-                                                playerStats.bets ? playerStats.bets.map((bet: any) => (
-                                                    <div className="card-body d-flex flex-column">
-                                                        <h6 className="card-title">{getBetLabel(bet.bet)}</h6>
-                                                        <p className="card-text ">{bet.count} %</p>
-                                                    </div>
-                                                )) : null
-                                            }
-                                        </div>
+
+                                        {
+                                            playerStats.bets ?
+                                                <div className={"card mt-2 mb-3 d-flex flex-row"}>
+                                                    {playerStats.bets.map((bet: any) => (
+                                                        <div className="card-body d-flex flex-column">
+                                                            <h6 className="card-title">{getBetLabel(bet.bet)}</h6>
+                                                            <p className="card-text ">{bet.percentage} %</p>
+                                                        </div>
+                                                    ))}
+                                                </div> : null
+                                        }
                                     </div>
                                 </div>
                                 : null
