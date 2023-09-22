@@ -4,7 +4,7 @@ import {
     sessionAdded,
     startLoading,
     sessionError,
-    getVisitedSessionIdsFromLocalStorage,
+    getVisitedSessionIdsFromLocalStorage, removeSessionIdFromLocalStorage,
 } from '../../store/sessionSlice';
 import {RootState} from "../../store";
 import {playerError, playersReceived, startLoadingPlayers} from "../../store/playerSlice";
@@ -56,12 +56,27 @@ const AddSession: React.FC = () => {
                     }
 
                 } catch (error: any) {
+                    if (
+                        error.response
+                        && error.response.status === 404
+                        && error.response.data
+                    ) {
+                        removeSessionIdFromLocalStorage(error.response.data._id);
+                    }
                     dispatch(sessionError(error.message));
                 }
             }
         });
 
         await Promise.all(fetchSessionPromises);
+
+        const filteredArray = ids.filter(function (e: any, pos: any) {
+            return ids.indexOf(e) == pos;
+        });
+
+        localSessions = localSessions.sort((a: Session, b: Session) => {
+            return filteredArray.indexOf(a._id) - filteredArray.indexOf(b._id);
+        });
 
         setSessions(localSessions);
         setIsLoading(false);
@@ -184,7 +199,7 @@ const AddSession: React.FC = () => {
                             formData={formData}
                             setFormData={setFormData}
                             selectOptions={selectOptions}
-                         />
+                        />
                     ))}
 
                     <div className="d-flex justify-content-center pt-3">

@@ -39,7 +39,21 @@ export const addSessionIdToLocalStorage = (sessionId: string | undefined) => {
     const visitedSessions = JSON.parse(localStorage.getItem('visitedSessions') || '[]');
 
     if (!visitedSessions.includes(sessionId)) {
-        visitedSessions.push(sessionId);
+        visitedSessions.unshift(sessionId);
+        localStorage.setItem('visitedSessions', JSON.stringify(visitedSessions));
+    }
+
+    visitedSessions.unshift(sessionId);
+    localStorage.setItem('visitedSessions', JSON.stringify(visitedSessions));
+
+}
+
+export const removeSessionIdFromLocalStorage = (sessionId: string | undefined) => {
+    const visitedSessions = JSON.parse(localStorage.getItem('visitedSessions') || '[]');
+
+    if (visitedSessions.includes(sessionId)) {
+        const index = visitedSessions.indexOf(sessionId);
+        visitedSessions.splice(index, 1);
         localStorage.setItem('visitedSessions', JSON.stringify(visitedSessions));
     }
 }

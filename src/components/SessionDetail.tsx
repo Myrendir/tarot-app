@@ -87,7 +87,6 @@ const SessionDetail: React.FC = () => {
         // eslint-disable-next-line
     }, [id]);
 
-    console.log(session?.players);
     const handleReset = () => {
         setBet('');
         setTaker('');
