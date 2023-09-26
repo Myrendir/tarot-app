@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import api from '../services/api';
-import {Session, SessionPlayer} from '../model/Session';
+import {getSeasonLabel, Session, SessionPlayer} from '../model/Session';
 import {BET, PETIT_AU_BOUT, TIPS, MAX_SCORE} from '../model/Game';
 import Modal from 'react-modal';
 import {Modal as BootstrapModal, Button} from "react-bootstrap";
@@ -134,7 +134,11 @@ const SessionDetail: React.FC = () => {
             toastr.success('Succès', 'Les points ont été ajoutés à la session.', {timeOut: 3000});
             handleReset();
             fetchSession();
-        } catch (error) {
+        } catch (error: any) {
+            if (error.response && error.response.status === 400) {
+                toastr.warning('Hopopop', error.response.data.message, {timeOut: 3000});
+                return;
+            }
             console.error("Erreur lors de l'ajout du jeu:", error);
         }
     };
@@ -192,6 +196,7 @@ const SessionDetail: React.FC = () => {
             console.error("Erreur lors de la suppression du dernier jeu:", error);
         }
     }
+
     const highestScore = session?.players.reduce((max, player) => player.score > max ? player.score : max, -Infinity);
     // @ts-ignore
     const secondHighestScore = session?.players.reduce((max, player) => player.score > max && player.score < highestScore ? player.score : max, -Infinity);
@@ -199,6 +204,7 @@ const SessionDetail: React.FC = () => {
         <MobileLayout>
             {isLoading && <Loading/>}
             <div className="container mt-4">
+              <h6 className="text-center mb-4">{getSeasonLabel(session?.season)}</h6>
                 <table className="table table-bordered mb-4" onClick={() => setModalOpen(true)}>
                     <thead>
                     <tr>

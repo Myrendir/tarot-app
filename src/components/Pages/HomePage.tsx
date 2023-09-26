@@ -17,6 +17,7 @@ const HomePage = () => {
     const [topAveragePoints, setTopAveragePoints] = useState<any>([]);
     const [topGWinrate, setTopGWinrate] = useState<any>([]);
     const [isLoading, setIsLoading] = useState(true);
+
     useEffect(() => {
         api.get('/stats/gamesTaken')
             .then(response => {
@@ -90,7 +91,6 @@ const HomePage = () => {
                                 <Widget children={<Podium players={topGWinrate.slice(0, 3)} dataKey={'winrate'}
                                                           percentage={true}/>}
                                         title={'Top winrate garde'}/> : null}
-
 
                         </div>
                         <div className="text-center pb-3">
