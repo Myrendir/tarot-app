@@ -70,25 +70,34 @@ const HomePage = () => {
                     <div className="container mt-4">
                         <div className="row">
                             {mostGamesTaken.length > 0 ?
-                                <Widget children={<Podium players={mostGamesTaken.slice(0, 3)} dataKey={'count'}/>}
+                                <Widget children={<Podium players={mostGamesTaken}
+                                                          dataKey={'count'}
+                                                          title={'Top preneurs'}/>}
                                         title={'Top preneurs'}/> : null}
                             {mostGamesCalled.length > 0 ?
-                                <Widget children={<Podium players={mostGamesCalled.slice(0, 3)} dataKey={'count'}/>}
+                                <Widget children={<Podium players={mostGamesCalled}
+                                                          dataKey={'count'}
+                                                          title={'Top appelés'}/>}
                                         title={'Top appelés'}/> : null}
                             {mostPointsCumulated.length > 0 ?
-                                <Widget children={<Podium players={mostPointsCumulated.slice(0, 3)}
-                                                          dataKey={'totalPoints'}/>}
+                                <Widget children={<Podium players={mostPointsCumulated}
+                                                          dataKey={'totalPoints'} title={'Top points cumulés'}/>}
                                         title={'Top points cumulés'}/> : null}
                             {topWinrate.length > 0 ?
-                                <Widget children={<Podium players={topWinrate.slice(0, 3)} dataKey={'winPercentage'}
+                                <Widget children={<Podium players={topWinrate}
+                                                          dataKey={'winPercentage'}
+                                                          title={'Top winrate preneurs'}
                                                           percentage={true}/>}
                                         title={'Top winrate preneurs'}/> : null}
                             {topAveragePoints.length > 0 ?
-                                <Widget children={<Podium players={topAveragePoints.slice(0, 3)}
-                                                          dataKey={'averagePoints'}/>}
+                                <Widget children={<Podium players={topAveragePoints}
+                                                          dataKey={'averagePoints'}
+                                                          title={'Top moyenne de points par partie'}/>}
                                         title={'Top moyenne de points par partie'}/> : null}
                             {topGWinrate.length > 0 ?
-                                <Widget children={<Podium players={topGWinrate.slice(0, 3)} dataKey={'winrate'}
+                                <Widget children={<Podium players={topGWinrate}
+                                                          dataKey={'winrate'}
+                                                          title={'Top winrate garde'}
                                                           percentage={true}/>}
                                         title={'Top winrate garde'}/> : null}
 

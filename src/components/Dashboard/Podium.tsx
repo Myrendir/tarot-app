@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import '../podium.css';
+import {Modal, Button} from 'react-bootstrap';
 
 type PlayerPodium = {
     firstname: string,
@@ -10,10 +11,18 @@ type PlayerPodium = {
 type PodiumProps = {
     players: PlayerPodium[],
     dataKey: string,
-    percentage?: boolean
+    percentage?: boolean,
+    title: string
 }
 
-const Podium = ({players, dataKey, percentage}: PodiumProps) => {
+const Podium = ({players, dataKey, percentage, title}: PodiumProps) => {
+
+    const [showModal, setShowModal] = useState(false);
+
+    const handleShowModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
+
+    const topThree = players.slice(0, 3);
 
     const getFullName = (player: PlayerPodium) => {
         return `${player.firstname} ${player.lastname.charAt(0).toUpperCase()}.`;
@@ -54,24 +63,68 @@ const Podium = ({players, dataKey, percentage}: PodiumProps) => {
     }
 
     return (
-
-        <div className="podium">
-            <div className={`podium-${getStep(getEqualScoreIndices(players, dataKey), 2, 1)}`}>
-                <span className="podium-name">{players[1] && getFullName(players[1])}</span>
-                {percentage ? `${players[1][dataKey].toFixed(2)}% ` : (Math.round(players[1][dataKey]))}
-                {(players[1].totalGames ? ` (${players[1].totalGames})` : null)}
+        <>
+            <div className="podium">
+                <div className={`podium-${getStep(getEqualScoreIndices(topThree, dataKey), 2, 1)}`}>
+                    <span className="podium-name">{topThree[1] && getFullName(topThree[1])}</span>
+                    {percentage ? `${topThree[1][dataKey].toFixed(2)}% ` : (Math.round(topThree[1][dataKey]))}
+                    {(topThree[1].totalGames ? ` (${topThree[1].totalGames})` : null)}
+                </div>
+                <div className={`podium-${getStep(getEqualScoreIndices(topThree, dataKey), 1, 0)}`}>
+                    <span className="podium-name">{topThree[0] && getFullName(topThree[0])}</span>
+                    {percentage ? `${topThree[0][dataKey].toFixed(2)}% ` : (Math.round(topThree[0][dataKey]))}
+                    {(topThree[0].totalGames ? ` (${topThree[0].totalGames})` : null)}
+                </div>
+                <div className={`podium-${getStep(getEqualScoreIndices(topThree, dataKey), 3, 2)}`}>
+                    <span className="podium-name">{topThree[2] && getFullName(topThree[2])}</span>
+                    {percentage ? `${topThree[2][dataKey].toFixed(2)}% ` : (Math.round(topThree[2][dataKey]))}
+                    {(topThree[2].totalGames ? ` (${topThree[2].totalGames})` : null)}
+                </div>
             </div>
-            <div className={`podium-${getStep(getEqualScoreIndices(players, dataKey), 1, 0)}`}>
-                <span className="podium-name">{players[0] && getFullName(players[0])}</span>
-                {percentage ? `${players[0][dataKey].toFixed(2)}% ` : (Math.round(players[0][dataKey]))}
-                {(players[0].totalGames ? ` (${players[0].totalGames})` : null)}
+            <div className="d-flex justify-content-end">
+                <button
+                    className="btn btn-outline-primary btn-sm mt-2"
+                    onClick={handleShowModal}
+                >
+                    Voir le classement complet
+                </button>
             </div>
-            <div className={`podium-${getStep(getEqualScoreIndices(players, dataKey), 3, 2)}`}>
-                <span className="podium-name">{players[2] && getFullName(players[2])}</span>
-                {percentage ? `${players[2][dataKey].toFixed(2)}% ` : (Math.round(players[2][dataKey]))}
-                {(players[2].totalGames ? ` (${players[2].totalGames})` : null)}
-            </div>
-        </div>
+            <Modal show={showModal} onHide={handleCloseModal}>
+                <Modal.Header>
+                    <Modal.Title>{title}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body style={{maxHeight: '60vh', overflowY: 'auto'}}>
+                    <table className="table">
+                        <thead>
+                        <tr>
+                            <th>Position</th>
+                            <th>Nom</th>
+                            <th>Score</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {players.map((player, index) => (
+                            <tr key={index}>
+                                <td>
+                                    {index === 0 && <span role="img" aria-label="gold medal">🥇</span>}
+                                    {index === 1 && <span role="img" aria-label="silver medal">🥈</span>}
+                                    {index === 2 && <span role="img" aria-label="bronze medal">🥉</span>}
+                                    {index > 2 ? index + 1 : null}
+                                </td>
+                                <td>{getFullName(player)}</td>
+                                <td>{dataKey === 'totalPoints' ? player[dataKey] : player[dataKey].toFixed(2)}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Fermer
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
     )
 };
 
