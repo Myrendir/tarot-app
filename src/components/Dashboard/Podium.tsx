@@ -113,7 +113,7 @@ const Podium = ({players, dataKey, percentage, title}: PodiumProps) => {
                                     {index > 2 ? index + 1 : null}
                                 </td>
                                 <td>{getFullName(player)}</td>
-                                <td>{percentage ? player[dataKey].toFixed(2) : player[dataKey]}</td>
+                                <td>{(percentage || dataKey === 'averagePoints') ? player[dataKey].toFixed(2) : player[dataKey]}</td>
                             </tr>
                         ))}
                         </tbody>
