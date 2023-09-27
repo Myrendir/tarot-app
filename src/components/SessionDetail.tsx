@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import api from '../services/api';
-import {getSeasonLabel, Session, SessionPlayer} from '../model/Session';
+import {getSeason, getSeasonLabel, Session, SessionPlayer} from '../model/Session';
 import {BET, PETIT_AU_BOUT, TIPS, MAX_SCORE} from '../model/Game';
 import Modal from 'react-modal';
 import {Modal as BootstrapModal, Button} from "react-bootstrap";
@@ -114,7 +114,6 @@ const SessionDetail: React.FC = () => {
             return;
         }
 
-
         try {
             const game = {
                 players: session?.players.map(player => ({player: player.player._id})) || [],
@@ -197,6 +196,15 @@ const SessionDetail: React.FC = () => {
         }
     }
 
+    const isCurrentSeason = (): boolean => {
+        if (!session) {
+            return false;
+        }
+        const currentSeason = getSeason(new Date());
+
+        return session.season === currentSeason;
+    }
+
     const highestScore = session?.players.reduce((max, player) => player.score > max ? player.score : max, -Infinity);
     // @ts-ignore
     const secondHighestScore = session?.players.reduce((max, player) => player.score > max && player.score < highestScore ? player.score : max, -Infinity);
@@ -239,7 +247,7 @@ const SessionDetail: React.FC = () => {
 
                 </table>
                 {
-                    session?.games && session?.games.length > 0 ?
+                    session?.games && session?.games.length > 0 && isCurrentSeason() ?
                         (<div className="text-right" style={
                             {marginTop: '-20px'}
                         }>
@@ -438,7 +446,7 @@ const SessionDetail: React.FC = () => {
                             </div>
                         </div>
                         {
-                            !isModalOpen && (
+                            (!isModalOpen && isCurrentSeason()) &&  (
                                 <div className="d-flex justify-content-center pt-3 pb-3">
                                     <SaveButton onClick={handleAddGame}/>
                                     <ResetButton onClick={handleReset}/>

@@ -36,3 +36,22 @@ export const getSeasonLabel = (season: any) => {
             return 'Été 2024';
     }
 }
+
+export const getSeason = (date: Date) => {
+    const autumn2023 = [new Date(2023, 8, 23), new Date(2023, 11, 21)];
+    const winter2023 = [new Date(2024, 11, 22), new Date(2024, 2, 19)];
+    const spring2024 = [new Date(2024, 2, 20), new Date(2024, 5, 19)];
+    const summer2024 = [new Date(2024, 5, 20), new Date(2024, 8, 21)];
+
+    if (date >= autumn2023[0] && date <= autumn2023[1]) {
+        return 'autumn2023';
+    } else if (date >= winter2023[0] && date <= winter2023[1]) {
+        return 'winter2023';
+    } else if (date >= spring2024[0] && date <= spring2024[1]) {
+        return 'spring2024';
+    } else if (date >= summer2024[0] && date <= summer2024[1]) {
+        return 'summer2024';
+    } else {
+        return '';
+    }
+}

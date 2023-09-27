@@ -24,6 +24,7 @@ const Podium = ({players, dataKey, percentage, title}: PodiumProps) => {
 
     const topThree = players.slice(0, 3);
 
+
     const getFullName = (player: PlayerPodium) => {
         return `${player.firstname} ${player.lastname.charAt(0).toUpperCase()}.`;
     }
@@ -112,14 +113,14 @@ const Podium = ({players, dataKey, percentage, title}: PodiumProps) => {
                                     {index > 2 ? index + 1 : null}
                                 </td>
                                 <td>{getFullName(player)}</td>
-                                <td>{dataKey === 'totalPoints' ? player[dataKey] : player[dataKey].toFixed(2)}</td>
+                                <td>{percentage ? player[dataKey].toFixed(2) : player[dataKey]}</td>
                             </tr>
                         ))}
                         </tbody>
                     </table>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseModal}>
+                    <Button variant="warning" onClick={handleCloseModal}>
                         Fermer
                     </Button>
                 </Modal.Footer>

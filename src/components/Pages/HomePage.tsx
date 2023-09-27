@@ -7,6 +7,7 @@ import '../podium.css';
 import Loading from "../Loading";
 import Widget from "../Dashboard/Widget";
 import Podium from "../Dashboard/Podium";
+import {getSeason} from "../../model/Session";
 
 
 const HomePage = () => {
@@ -18,8 +19,11 @@ const HomePage = () => {
     const [topGWinrate, setTopGWinrate] = useState<any>([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    const currentSeason = getSeason(new Date());
     useEffect(() => {
-        api.get('/stats/gamesTaken')
+
+
+        api.get('/stats/gamesTaken/' + currentSeason)
             .then(response => {
                 setMostGamesTaken(response.data);
             })
@@ -27,7 +31,7 @@ const HomePage = () => {
                 console.error("Error fetching most games taken:", error);
             });
 
-        api.get('/stats/calledPartners')
+        api.get('/stats/calledPartners/' + currentSeason)
             .then(response => {
                 setMostGamesCalled(response.data);
             })
@@ -35,25 +39,25 @@ const HomePage = () => {
                 console.error("Error fetching most games called:", error);
             });
 
-        api.get('/stats/mostPointsCumulated')
+        api.get('/stats/mostPointsCumulated/'+ currentSeason)
             .then(response => {
                 setMostPointsCumulated(response.data);
             }).catch(error => {
             console.error("Error fetching most points cumulated:", error);
         })
-        api.get('/stats/topWinrate')
+        api.get('/stats/topWinrate/' + currentSeason)
             .then(response => {
                 setTopWinrate(response.data);
             }).catch(error => {
             console.error("Error fetching top winrate:", error);
         })
-        api.get('/stats/bestAveragePointsPerGame')
+        api.get('/stats/bestAveragePointsPerGame/' + currentSeason)
             .then(response => {
                 setTopAveragePoints(response.data);
             }).catch(error => {
             console.error("Error fetching top average points:", error);
         })
-        api.get('/stats/mostWinrateForBet/g')
+        api.get('/stats/mostWinrateForBet/g/' + currentSeason)
             .then(response => {
                 setTopGWinrate(response.data);
             })
@@ -63,49 +67,45 @@ const HomePage = () => {
         setIsLoading(false);
     }, []);
 
+    console.log(mostGamesTaken)
     return (
         <MobileLayout>
             {
                 isLoading ? <Loading/> :
                     <div className="container mt-4">
                         <div className="row">
-                            {mostGamesTaken.length > 0 ?
+                            {mostGamesTaken.length > 2 ?
                                 <Widget children={<Podium players={mostGamesTaken}
                                                           dataKey={'count'}
                                                           title={'Top preneurs'}/>}
                                         title={'Top preneurs'}/> : null}
-                            {mostGamesCalled.length > 0 ?
+                            {mostGamesCalled.length > 2 ?
                                 <Widget children={<Podium players={mostGamesCalled}
                                                           dataKey={'count'}
                                                           title={'Top appelés'}/>}
                                         title={'Top appelés'}/> : null}
-                            {mostPointsCumulated.length > 0 ?
+                            {mostPointsCumulated.length > 2 ?
                                 <Widget children={<Podium players={mostPointsCumulated}
                                                           dataKey={'totalPoints'} title={'Top points cumulés'}/>}
                                         title={'Top points cumulés'}/> : null}
-                            {topWinrate.length > 0 ?
+                            {topWinrate.length > 2 ?
                                 <Widget children={<Podium players={topWinrate}
                                                           dataKey={'winPercentage'}
                                                           title={'Top winrate preneurs'}
                                                           percentage={true}/>}
                                         title={'Top winrate preneurs'}/> : null}
-                            {topAveragePoints.length > 0 ?
+                            {topAveragePoints.length > 2 ?
                                 <Widget children={<Podium players={topAveragePoints}
                                                           dataKey={'averagePoints'}
                                                           title={'Top moyenne de points par partie'}/>}
                                         title={'Top moyenne de points par partie'}/> : null}
-                            {topGWinrate.length > 0 ?
+                            {topGWinrate.length > 2 ?
                                 <Widget children={<Podium players={topGWinrate}
                                                           dataKey={'winrate'}
                                                           title={'Top winrate garde'}
                                                           percentage={true}/>}
                                         title={'Top winrate garde'}/> : null}
 
-                        </div>
-                        <div className="text-center pb-3">
-                            <Link className="btn btn-primary rounded-pill" to={"/session"}>Enregistrer des
-                                scores
-                            </Link>
                         </div>
                     </div>
             }
