@@ -74,6 +74,10 @@ const HomePage = () => {
                 isLoading ? <Loading/> :
                     <div className="container mt-4">
                         <div className="row">
+                            {mostPointsCumulated.length > 2 ?
+                                <Widget children={<Podium players={mostPointsCumulated}
+                                                          dataKey={'totalPoints'} title={'Top points cumulés'}/>}
+                                        title={'Top points cumulés'}/> : null}
                             {mostGamesTaken.length > 2 ?
                                 <Widget children={<Podium players={mostGamesTaken}
                                                           dataKey={'count'}
@@ -84,10 +88,6 @@ const HomePage = () => {
                                                           dataKey={'count'}
                                                           title={'Top appelés'}/>}
                                         title={'Top appelés'}/> : null}
-                            {mostPointsCumulated.length > 2 ?
-                                <Widget children={<Podium players={mostPointsCumulated}
-                                                          dataKey={'totalPoints'} title={'Top points cumulés'}/>}
-                                        title={'Top points cumulés'}/> : null}
                             {topWinrate.length > 2 ?
                                 <Widget children={<Podium players={topWinrate}
                                                           dataKey={'winPercentage'}
