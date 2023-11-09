@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faHome, faTrophy, faPlay} from '@fortawesome/free-solid-svg-icons';
+import {faHome, faTrophy, faPlayCircle} from '@fortawesome/free-solid-svg-icons';
 
 interface MobileLayoutProps {
     children: React.ReactNode;
@@ -26,13 +26,13 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({children}) => {
             <div className="navbar navbar-expand-lg navbar-light bg-light border-top fixed-bottom mt-5">
                 <div className="d-flex justify-content-around w-100">
                     <Link className="nav-link" to="/"><FontAwesomeIcon icon={faHome}
-                                                                       size="lg"
+                                                                       size="xl"
                                                                        className={getSelectedColor(location.pathname, ['/'])}/></Link>
-                    <Link className="nav-link" to="/session"><FontAwesomeIcon icon={faPlay}
-                                                                              size="lg"
+                    <Link className="nav-link" to="/session"><FontAwesomeIcon icon={faPlayCircle}
+                                                                              size="2xl"
                                                                               className={getSelectedColor(location.pathname, ['/session', '/session/'])}/></Link>
                     <Link className="nav-link" to="/stats"><FontAwesomeIcon icon={faTrophy}
-                                                                            size="lg"
+                                                                            size="xl"
                                                                             className={getSelectedColor(location.pathname, ['/stats'])}/></Link>
                 </div>
             </div>
