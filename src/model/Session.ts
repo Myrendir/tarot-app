@@ -8,7 +8,7 @@ export interface Session {
         score: number,
     }[];
     games: Game[];
-    season: Season|null;
+    season: Season | null;
 }
 
 export type SessionPlayer = {
@@ -34,19 +34,6 @@ export const getSeasonLabel = (season: any) => {
             return 'Printemps 2024';
         case Season.SUMMER2024:
             return 'Été 2024';
-    }
-}
-
-export const getSeasonIcon = (season: any) => {
-    switch (season) {
-        case Season.AUTUMN2023:
-            return 'leaf';
-        case Season.WINTER2023:
-            return 'snowflake';
-        case Season.SPRING2024:
-            return 'flower';
-        case Season.SUMMER2024:
-            return 'sun';
     }
 }
 

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import api from '../services/api';
-import {getSeason, getSeasonIcon, getSeasonLabel, Session, SessionPlayer} from '../model/Session';
+import {getSeason, getSeasonLabel, Season, Session, SessionPlayer} from '../model/Session';
 import {BET, PETIT_AU_BOUT, TIPS, MAX_SCORE} from '../model/Game';
 import Modal from 'react-modal';
 import {Modal as BootstrapModal, Button} from "react-bootstrap";
@@ -14,6 +14,10 @@ import {addSessionIdToLocalStorage} from "../store/sessionSlice";
 import {FaCrown, FaStar} from 'react-icons/fa'
 import {BsFillArrowLeftCircleFill} from 'react-icons/bs'
 import {Player} from "../model/Player";
+import PumpkinIco from "./Icons/seasons/PumpkinIco";
+import FlowerIco from "./Icons/seasons/FlowerIco";
+import SnowIco from "./Icons/seasons/SnowIco";
+import SunIco from "./Icons/seasons/SunIco";
 
 const SessionDetail: React.FC = () => {
     const {id} = useParams<{ id: string }>();
@@ -44,7 +48,6 @@ const SessionDetail: React.FC = () => {
         setShowAddStarModal(!showAddStarModal);
     }
 
-    console.log(guilty, guiltyType)
     const addStar = async () => {
         if (guilty === '') {
             toastr.error('Erreur', 'Il faut sélectionner un joueur.', {timeOut: 3000});
@@ -263,14 +266,25 @@ const SessionDetail: React.FC = () => {
 
         return stars;
     }
+    const getSeasonIcon = (season: any) => {
+        if (season?.startsWith('autumn')) {
+            return <PumpkinIco/>
+        } else if (season?.startsWith('spring')) {
+            return <FlowerIco/>
+        } else if (season?.startsWith('winter')) {
+            return <SnowIco/>
+        } else if (season?.startsWith('summer')) {
+            return <SunIco/>
+        }
+    }
     return (
         <MobileLayout>
             {isLoading && <Loading/>}
             <div className="container mt-4">
-                <h6 className="text-center mb-4">
-                    <i className={`fa fa-${getSeasonIcon(session?.season)}`}/>
-                    &nbsp;{getSeasonLabel(session?.season)}&nbsp;
-                    <i className={`fa fa-${getSeasonIcon(session?.season)}`}/>
+                <h6 className="mb-4 d-flex justify-content-center align-items-center">
+                    <div>{getSeasonIcon(session?.season)}</div>
+                    <div>&nbsp;{getSeasonLabel(session?.season)}&nbsp;</div>
+                    <div>{getSeasonIcon(session?.season)}</div>
                 </h6>
                 <table className="table table-bordered mb-4" onClick={() => setModalOpen(true)}>
                     <thead>
@@ -441,7 +455,7 @@ const SessionDetail: React.FC = () => {
 
                             <div className="d-flex justify-content-center mt-2">
                                 <div className={"m-1"}>
-                                    <button className="btn btn-danger" onClick={() => {
+                                    <button className="btn btn-danger rounded-pill" onClick={() => {
                                         handleAddStar();
                                         setGuilty('');
                                         setGuiltyType('');
@@ -449,7 +463,7 @@ const SessionDetail: React.FC = () => {
                                     </button>
                                 </div>
                                 <div className={"m-1"}>
-                                    <button className="btn btn-primary" onClick={addStar}>Ajouter</button>
+                                    <button className="btn btn-primary rounded-pill" onClick={addStar}>Ajouter</button>
                                 </div>
                             </div>
                         </div>
