@@ -46,6 +46,17 @@ const SessionDetail: React.FC = () => {
 
     console.log(guilty, guiltyType)
     const addStar = async () => {
+        if (guilty === '') {
+            toastr.error('Erreur', 'Il faut sélectionner un joueur.', {timeOut: 3000});
+            return;
+        }
+
+        if (guiltyType === '') {
+            toastr.error('Erreur', 'Il faut sélectionner un type d\'erreur.', {timeOut: 3000});
+            return;
+        }
+
+
         api
             .post(`/session/addStar/${id}/${guilty}`, {
                 type: guiltyType
