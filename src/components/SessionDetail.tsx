@@ -11,7 +11,7 @@ import {toastr} from "react-redux-toastr";
 import ResetButton from "./Button/ResetButton";
 import Loading from "./Loading";
 import {addSessionIdToLocalStorage} from "../store/sessionSlice";
-import {FaCrown} from 'react-icons/fa'
+import {FaCrown, FaStar} from 'react-icons/fa'
 import {BsFillArrowLeftCircleFill} from 'react-icons/bs'
 import {Player} from "../model/Player";
 
@@ -245,7 +245,9 @@ const SessionDetail: React.FC = () => {
 
         const stars = [];
         for (let i = 0; i < pendingStars; i++) {
-            stars.push(<i key={i} className="fa fa-star" style={{ color: '#c43d27' }} />);
+            stars.push(<FaStar style={{
+                paddingBottom: '2px',
+            }} key={i} color={"#c43d27"}/>);
         }
 
         return stars;
@@ -277,8 +279,12 @@ const SessionDetail: React.FC = () => {
                                 {
                                     session?.games.length > 0 && (
                                         <div>
-                                            {player.score === highestScore && <FaCrown color={'gold'}/>}
-                                            {player.score === secondHighestScore && <FaCrown color={'silver'}/>}
+                                            {player.score === highestScore && <FaCrown size={25} style={{
+                                                paddingBottom: '2px',
+                                            }} color={'gold'}/>}
+                                            {player.score === secondHighestScore && <FaCrown size={25} style={{
+                                                paddingBottom: '2px',
+                                            }} color={'silver'}/>}
                                         </div>
                                     )
                                 }
@@ -294,7 +300,7 @@ const SessionDetail: React.FC = () => {
 
                 </table>
                 {
-                    session?.games && session?.games.length > 0 && isCurrentSeason() ?
+                    isCurrentSeason() ?
                         (
                             <div className="d-flex justify-content-between mb-2">
                                 <div>
@@ -305,14 +311,18 @@ const SessionDetail: React.FC = () => {
                                     }}><i className="fa fa-star"/> Ajouter une étoile
                                     </button>
                                 </div>
-                                <div>
-                                    <button type="button" className="btn btn-warning btn-sm" style={{
-                                        fontSize: '0.7rem',
-                                    }} onClick={() => {
-                                        setShowDeleteModal(true);
-                                    }}>Annuler la dernière partie
-                                    </button>
-                                </div>
+                                {session?.games && session?.games.length > 0 ?
+                                    (
+
+                                        <div>
+                                            <button type="button" className="btn btn-warning btn-sm" style={{
+                                                fontSize: '0.7rem',
+                                            }} onClick={() => {
+                                                setShowDeleteModal(true);
+                                            }}>Annuler la dernière partie
+                                            </button>
+                                        </div>
+                                    ) : null}
                             </div>
                         ) : null
                 }
