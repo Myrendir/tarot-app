@@ -20,8 +20,8 @@ const HomePage = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     const currentSeason = getSeason(new Date());
-    useEffect(() => {
 
+    useEffect(() => {
 
         api.get('/stats/gamesTaken/' + currentSeason)
             .then(response => {
@@ -39,7 +39,7 @@ const HomePage = () => {
                 console.error("Error fetching most games called:", error);
             });
 
-        api.get('/stats/mostPointsCumulated/'+ currentSeason)
+        api.get('/stats/mostPointsCumulated/' + currentSeason)
             .then(response => {
                 setMostPointsCumulated(response.data);
             }).catch(error => {

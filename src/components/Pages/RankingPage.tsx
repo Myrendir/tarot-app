@@ -104,16 +104,22 @@ const RankingPage = () => {
                                             </div>
                                         </div>
                                         <div className={"d-flex"}>
-                                            <div className="card mt-2 col-6">
+                                            <div className="card mt-2 col-4">
                                                 <div className="card-body">
                                                     <h6 className="card-text">Parties</h6>
                                                     <p className="card-text">{playerStats.totalGames}</p>
                                                 </div>
                                             </div>
-                                            <div className={"card mt-2 col-6"}>
+                                            <div className={"card mt-2 col-4"}>
                                                 <div className="card-body">
                                                     <h6 className="card-text">Sessions</h6>
                                                     <p className="card-text">{playerStats.totalSessions}</p>
+                                                </div>
+                                            </div>
+                                            <div className={"card mt-2 col-4"}>
+                                                <div className="card-body">
+                                                    <h6 className="card-text">Étoiles</h6>
+                                                    <p className="card-text">{playerStats.stars}</p>
                                                 </div>
                                             </div>
                                         </div>

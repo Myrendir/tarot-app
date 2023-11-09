@@ -37,6 +37,19 @@ export const getSeasonLabel = (season: any) => {
     }
 }
 
+export const getSeasonIcon = (season: any) => {
+    switch (season) {
+        case Season.AUTUMN2023:
+            return 'leaf';
+        case Season.WINTER2023:
+            return 'snowflake';
+        case Season.SPRING2024:
+            return 'flower';
+        case Season.SUMMER2024:
+            return 'sun';
+    }
+}
+
 export const getSeason = (date: Date) => {
     const autumn2023 = [new Date(2023, 8, 23), new Date(2023, 11, 21)];
     const winter2023 = [new Date(2024, 11, 22), new Date(2024, 2, 19)];

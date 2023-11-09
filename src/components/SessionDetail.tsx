@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import api from '../services/api';
-import {getSeason, getSeasonLabel, Session, SessionPlayer} from '../model/Session';
+import {getSeason, getSeasonIcon, getSeasonLabel, Session, SessionPlayer} from '../model/Session';
 import {BET, PETIT_AU_BOUT, TIPS, MAX_SCORE} from '../model/Game';
 import Modal from 'react-modal';
 import {Modal as BootstrapModal, Button} from "react-bootstrap";
@@ -12,7 +12,8 @@ import ResetButton from "./Button/ResetButton";
 import Loading from "./Loading";
 import {addSessionIdToLocalStorage} from "../store/sessionSlice";
 import {FaCrown} from 'react-icons/fa'
-import {BsFillArrowLeftCircleFill, BsFillArrowRightCircleFill} from 'react-icons/bs'
+import {BsFillArrowLeftCircleFill} from 'react-icons/bs'
+import {Player} from "../model/Player";
 
 const SessionDetail: React.FC = () => {
     const {id} = useParams<{ id: string }>();
@@ -33,8 +34,33 @@ const SessionDetail: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [offset, setOffset] = useState(0);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showAddStarModal, setShowAddStarModal] = useState(false);
+    const [guilty, setGuilty] = useState('');
+    const [guiltyType, setGuiltyType] = useState('');
+
     const slideAmount = 200;
 
+    const handleAddStar = () => {
+        setShowAddStarModal(!showAddStarModal);
+    }
+
+    console.log(guilty, guiltyType)
+    const addStar = async () => {
+        api
+            .post(`/session/addStar/${id}/${guilty}`, {
+                type: guiltyType
+            })
+            .then(() => {
+                toastr.success('Succès', 'L\'étoile a été ajoutée.', {timeOut: 3000});
+                setShowAddStarModal(false);
+                setGuilty('');
+                setGuiltyType('');
+                fetchSession();
+            })
+            .catch(error => {
+                console.error("Erreur lors de l'ajout de l'étoile:", error);
+            })
+    }
     const setDeleteModalOpen = async () => {
         setShowDeleteModal(false);
         await deleteLastGame();
@@ -46,6 +72,7 @@ const SessionDetail: React.FC = () => {
     const handleRightSlide = () => {
         setOffset(offset - slideAmount);
     };
+
     const handleAttackingScoreChange = (score: number) => {
         if (score <= MAX_SCORE) {
             setAttackingTeamScore(score);
@@ -59,6 +86,7 @@ const SessionDetail: React.FC = () => {
             setAttackingTeamScore(MAX_SCORE - score);
         }
     };
+
     const fetchSession = async () => {
         try {
             const response = await api.get(`/session/${id}`);
@@ -208,11 +236,29 @@ const SessionDetail: React.FC = () => {
     const highestScore = session?.players.reduce((max, player) => player.score > max ? player.score : max, -Infinity);
     // @ts-ignore
     const secondHighestScore = session?.players.reduce((max, player) => player.score > max && player.score < highestScore ? player.score : max, -Infinity);
+
+    const renderStars = (player: Player) => {
+        const pendingStars = player.stars.length % 3;
+        if (pendingStars === 0) {
+            return null; // Return null to render nothing
+        }
+
+        const stars = [];
+        for (let i = 0; i < pendingStars; i++) {
+            stars.push(<i key={i} className="fa fa-star" style={{ color: '#c43d27' }} />);
+        }
+
+        return stars;
+    }
     return (
         <MobileLayout>
             {isLoading && <Loading/>}
             <div className="container mt-4">
-              <h6 className="text-center mb-4">{getSeasonLabel(session?.season)}</h6>
+                <h6 className="text-center mb-4">
+                    <i className={`fa fa-${getSeasonIcon(session?.season)}`}/>
+                    &nbsp;{getSeasonLabel(session?.season)}&nbsp;
+                    <i className={`fa fa-${getSeasonIcon(session?.season)}`}/>
+                </h6>
                 <table className="table table-bordered mb-4" onClick={() => setModalOpen(true)}>
                     <thead>
                     <tr>
@@ -225,7 +271,8 @@ const SessionDetail: React.FC = () => {
                         <tr key={player.player._id}>
                             <td className={'d-flex'} style={{justifyContent: 'space-between'}}>
                                 <div>
-                                    {player.player.firstname + ' ' + player.player.lastname.charAt(0).toUpperCase() + '.'}
+                                    {player.player.firstname + ' ' + player.player.lastname.charAt(0).toUpperCase() + '. '}
+                                    {renderStars(player.player)}
                                 </div>
                                 {
                                     session?.games.length > 0 && (
@@ -248,16 +295,26 @@ const SessionDetail: React.FC = () => {
                 </table>
                 {
                     session?.games && session?.games.length > 0 && isCurrentSeason() ?
-                        (<div className="text-right" style={
-                            {marginTop: '-20px'}
-                        }>
-                            <button type="button" className="btn btn-warning btn-sm" style={{
-                                fontSize: '0.7rem',
-                            }} onClick={() => {
-                                setShowDeleteModal(true);
-                            }}>Annuler la dernière partie
-                            </button>
-                        </div>) : null
+                        (
+                            <div className="d-flex justify-content-between mb-2">
+                                <div>
+                                    <button type="button" className="btn btn-dark btn-sm" style={{
+                                        fontSize: '0.7rem',
+                                    }} onClick={() => {
+                                        handleAddStar();
+                                    }}><i className="fa fa-star"/> Ajouter une étoile
+                                    </button>
+                                </div>
+                                <div>
+                                    <button type="button" className="btn btn-warning btn-sm" style={{
+                                        fontSize: '0.7rem',
+                                    }} onClick={() => {
+                                        setShowDeleteModal(true);
+                                    }}>Annuler la dernière partie
+                                    </button>
+                                </div>
+                            </div>
+                        ) : null
                 }
 
                 <BootstrapModal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
@@ -291,7 +348,7 @@ const SessionDetail: React.FC = () => {
                         {offset < 0 &&
                             <button className='btn' onClick={handleLeftSlide}><BsFillArrowLeftCircleFill size={20}/>
                             </button>} {/* Left arrow */}
-
+                        {/*
                         <div className="mb-4" style={{overflowX: 'auto', flexGrow: 1}}>
                             <table className="table table-bordered"
                                    style={{transform: `translateX(${offset}px)`, transition: 'transform 0.3s'}}>
@@ -319,6 +376,9 @@ const SessionDetail: React.FC = () => {
 
                         <button className='btn' onClick={handleRightSlide}><BsFillArrowRightCircleFill size={20}/>
                         </button>
+                    </div>*/}
+
+                        <h1>Cette modal n'existe pas</h1>
                     </div>
                     {/*place button bottom left*/}
                     <div className={'float-right'}>
@@ -327,6 +387,53 @@ const SessionDetail: React.FC = () => {
                 </Modal>
 
 
+                <Modal isOpen={showAddStarModal} onRequestClose={handleAddStar}
+                       style={{
+                           overlay: {
+                               backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                               zIndex: 9999
+                           },
+                           content: {height: 'calc(40%)'}
+                       }}
+
+                >
+                    <h3>Ajouter une étoile</h3>
+                    <div className="row">
+                        <div className="col-md-12">
+                            <h6>Joueur</h6>
+                            <select className="form-control" value={guilty} onChange={(e) => setGuilty(e.target.value)}>
+                                <option value=''>Sélectionner un joueur</option>
+                                {session?.players.map(player => (
+                                    <option key={player.player._id}
+                                            value={player.player._id}>{`${player.player.firstname} ${player.player.lastname.charAt(0).toUpperCase()}.`}</option>
+                                ))}
+                            </select>
+                            <h6 className="mt-1">Type d'erreur</h6>
+                            <select className="form-control"
+                                    value={guiltyType}
+                                    onChange={(e) => setGuiltyType(e.target.value)}>
+                                <option value=''>Sélectionner un type d'erreur</option>
+                                <option value='distribution'>Distribution</option>
+                                <option value='parle'>Parlante</option>
+                                <option value='jeu'>Faute de jeu</option>
+                            </select>
+
+                            <div className="d-flex justify-content-center mt-2">
+                                <div className={"m-1"}>
+                                    <button className="btn btn-danger" onClick={() => {
+                                        handleAddStar();
+                                        setGuilty('');
+                                        setGuiltyType('');
+                                    }}>Annuler
+                                    </button>
+                                </div>
+                                <div className={"m-1"}>
+                                    <button className="btn btn-primary" onClick={addStar}>Ajouter</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
                 {/* Form */}
                 <div className="row">
                     <div className="col-md-12">
@@ -446,7 +553,7 @@ const SessionDetail: React.FC = () => {
                             </div>
                         </div>
                         {
-                            (!isModalOpen && isCurrentSeason()) &&  (
+                            (!isModalOpen && isCurrentSeason()) && (
                                 <div className="d-flex justify-content-center pt-3 pb-3">
                                     <SaveButton onClick={handleAddGame}/>
                                     <ResetButton onClick={handleReset}/>
@@ -454,6 +561,7 @@ const SessionDetail: React.FC = () => {
                             )
                         }
                     </div>
+
                 </div>
             </div>
         </MobileLayout>

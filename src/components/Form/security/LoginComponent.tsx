@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import useLogin from '../../hooks/useLogin';
-import useLogout from '../../hooks/useLogout';  // Importez le hook useLogout
+import useLogin from '../../../hooks/useLogin';
+import useLogout from '../../../hooks/useLogout';  // Importez le hook useLogout
 import {useSelector} from 'react-redux';
 
 const LoginComponent: React.FC = () => {
