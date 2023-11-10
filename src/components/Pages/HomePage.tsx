@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
 import MobileLayout from "../../Layout/MobileLayout";
 import api from "../../services/api";
 
@@ -73,6 +72,7 @@ const HomePage = () => {
             {
                 isLoading ? <Loading/> :
                     <div className="container mt-4">
+
                         <div className="row">
                             {mostPointsCumulated.length > 2 ?
                                 <Widget children={<Podium players={mostPointsCumulated}
