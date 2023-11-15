@@ -4,6 +4,7 @@ import SelectPlayerComponent from "../Form/SelectPlayerComponent";
 import api from "../../services/api";
 import Loading from "../Loading";
 import {Player} from "../../model/Player";
+import Trophy from "../Icons/statistics/Trophy";
 
 const RankingPage = () => {
     const [players, setPlayers] = useState<any>([]);
@@ -50,6 +51,20 @@ const RankingPage = () => {
         label: `${player.firstname} ${player.lastname.charAt(0)}.`,
     }));
 
+    const getBetColor = (bets: any, bet: any) => {
+
+        let highestPercentage = 0;
+        bets.forEach((b: any) => {
+            const percentage = parseFloat(b.percentage);
+            if (percentage > highestPercentage) {
+                highestPercentage = percentage;
+            }
+        });
+
+        return (highestPercentage === parseFloat(bet.percentage) ? 'var(--Bleu, #054A81)' : 'grey');
+    };
+
+
     const getIdFromFormData = (formData: any) => {
         return formData.players.filter((p: any) => p !== null)[0];
     }
@@ -60,9 +75,9 @@ const RankingPage = () => {
             case 'g':
                 return 'Garde';
             case 'gs':
-                return 'Garde sans';
+                return 'G. sans';
             case 'gc':
-                return 'Garde contre';
+                return 'G. contre';
             default:
                 return '';
         }
@@ -96,77 +111,108 @@ const RankingPage = () => {
                             getIdFromFormData(formData) ?
                                 <div className="row">
                                     <div className="col-12">
-                                        <div className={"card mt-2"}>
-                                            <div className="card-body">
-                                                <h6 className="card-title text-center justify-content-start">Taux de
-                                                    victoire</h6>
-                                                <p className="card-text text-center justify-content-start">{playerStats.winRate} %</p>
+                                        <div className="card mt-1" style={{borderRadius: "14px"}}>
+                                            <div className="card-body text-center">
+                                                <Trophy/>
+                                                <p className="card-title text-center justify-content-start"
+                                                   style={{fontWeight: "bold"}}>
+                                                    Taux de victoire
+                                                </p>
+                                                <h3 className="card-text text-center justify-content-start" style={{
+                                                    color: 'var(--Bleu, #054A81)', fontSize: '2rem'
+
+                                                }}>
+                                                    {playerStats.winRate} %
+                                                </h3>
+                                            </div>
+                                        </div>
+                                        <div className={"d-flex "}>
+                                            <div className="card mt-2 col-4 mr-1" style={{borderRadius: "14px"}}>
+                                                <div className="text-start pt-3">
+                                                    <p style={{fontWeight: "bold"}}>Parties</p>
+                                                    <h3 style={{
+                                                        color: "var(--Bleu, #054A81)",
+                                                        fontSize: '2rem'
+                                                    }}>{playerStats.totalGames}</h3>
+                                                </div>
+                                            </div>
+                                            <div className={"card mt-2 col-4 mr-1"} style={{borderRadius: "14px"}}>
+                                                <div className="text-start pt-3">
+                                                    <p style={{fontWeight: "bold"}}>Sessions</p>
+                                                    <h3 style={{
+                                                        color: "var(--Bleu, #054A81)",
+                                                        fontSize: '2rem'
+                                                    }}>{playerStats.totalSessions}</h3>
+                                                </div>
+                                            </div>
+                                            <div className={"card mt-2 col-4"} style={{borderRadius: "14px"}}>
+                                                <div className="text-start pt-3">
+                                                    <p style={{fontWeight: "bold"}}>Étoiles</p>
+                                                    <h3 style={{
+                                                        color: "rgb(196, 61, 39",
+                                                        fontSize: '2rem'
+                                                    }}>{playerStats.stars}</h3>
+                                                </div>
                                             </div>
                                         </div>
                                         <div className={"d-flex"}>
-                                            <div className="card mt-2 col-4">
-                                                <div className="card-body">
-                                                    <h6 className="card-text">Parties</h6>
-                                                    <p className="card-text">{playerStats.totalGames}</p>
-                                                </div>
-                                            </div>
-                                            <div className={"card mt-2 col-4"}>
-                                                <div className="card-body">
-                                                    <h6 className="card-text">Sessions</h6>
-                                                    <p className="card-text">{playerStats.totalSessions}</p>
-                                                </div>
-                                            </div>
-                                            <div className={"card mt-2 col-4"}>
-                                                <div className="card-body">
-                                                    <h6 className="card-text">Étoiles</h6>
-                                                    <p className="card-text">{playerStats.stars}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className={"d-flex"}>
-                                            <div className={"card mt-2 col-6"}>
-                                                <div className="card-body">
-                                                    <h6 className="card-text">Points totaux</h6>
-                                                    <p className={`card-text ${getColor(playerStats.totalPoints)}`}>
+                                            <div className={"card mt-2 col-6 mr-2"} style={{borderRadius: "14px"}}>
+                                                <div className="text-start pt-3">
+                                                    <p style={{fontWeight: "bold"}}>Points totaux</p>
+                                                    <h3 className={`${getColor(playerStats.totalPoints)}`}>
                                                         {playerStats.totalPoints}
-                                                    </p>
+                                                    </h3>
                                                 </div>
                                             </div>
-                                            <div className={"card mt-2 col-6"}>
-                                                <div className="card-body">
-                                                    <h6 className="card-text">En moyenne</h6>
-                                                    <p className={`card-text ${getColor(playerStats.averagePointsPerGame)}`}>
+                                            <div className={"card mt-2 col-6"} style={{borderRadius: "14px"}}>
+                                                <div className="text-start pt-3">
+                                                    <p style={{fontWeight: "bold"}}>En moyenne</p>
+                                                    <h3 className={`${getColor(playerStats.averagePointsPerGame)}`}>
                                                         {playerStats.averagePointsPerGame}
-                                                    </p>
+                                                    </h3>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="d-flex">
-                                            <div className={"card mt-2 col-6"}>
-                                                <div className="card-body">
-                                                    <h6 className="card-title">Parties preneur</h6>
-                                                    <p className="card-text">{playerStats.takerRate} %</p>
+                                            <div className={"card mt-2 col-6 mr-2"} style={{borderRadius: "14px"}}>
+                                                <div className="text-start pt-3">
+                                                    <p style={{fontWeight: "bold"}}>Parties preneur</p>
+                                                    <h3 style={{
+                                                        color: 'var(--Bleu, #054A81)',
+                                                        fontSize: '2rem'
+                                                    }}>{playerStats.takerRate} %</h3>
                                                 </div>
                                             </div>
-                                            <div className={"card mt-2 col-6"}>
-                                                <div className="card-body">
-                                                    <h6 className="card-title">Parties appelé</h6>
-                                                    <p className="card-text">{playerStats.partnerRate} %</p>
+                                            <div className={"card mt-2 col-6"} style={{borderRadius: "14px"}}>
+                                                <div className="text-start pt-3">
+                                                    <p style={{fontWeight: "bold"}}>Parties appelé</p>
+                                                    <h3 style={{
+                                                        color: 'var(--Bleu, #054A81)',
+                                                        fontSize: '2rem'
+                                                    }}>{playerStats.partnerRate} %</h3>
                                                 </div>
                                             </div>
                                         </div>
 
                                         {
                                             playerStats.bets ?
-                                                <div className={"card mt-2 mb-5 d-flex flex-row"}>
-                                                    {playerStats.bets.map((bet: any) => (
-                                                        <div className="card-body d-flex flex-column">
-                                                            <h6 className="card-title">{getBetLabel(bet.bet)}</h6>
-                                                            <p className="card-text ">{bet.percentage}%</p>
+                                                <div className={"card mt-2 mb-5 d-flex flex-row justify-content-around"}
+                                                     style={{borderRadius: "14px"}}>
+                                                    {playerStats.bets.map((bet: any, index: number) => (
+                                                        <div className="text-center d-flex flex-column"
+                                                             style={{
+                                                                 borderRight: index !== playerStats.bets.length - 1 ? '1px solid #DDD' : '',
+                                                                 borderStartEndRadius: index !== playerStats.bets.length - 1 ? '14px' : '',
+                                                                 paddingRight: index !== playerStats.bets.length - 1 ? '10px' : '',
+                                                             }}>
+                                                            <p style={{fontWeight: "bold"}}>{getBetLabel(bet.bet)}</p>
+                                                            <h5 style={{color: `${getBetColor(playerStats.bets, bet)}`, fontWeight: "bold"}}>{bet.percentage}%</h5>
                                                         </div>
                                                     ))}
-                                                </div> : null
+                                                </div>
+                                                : null
                                         }
+
                                     </div>
                                 </div>
                                 : null

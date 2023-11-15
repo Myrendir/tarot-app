@@ -210,7 +210,11 @@ const AddSession: React.FC = () => {
                                 </div> :
                                 <button type="submit"
                                         disabled={foundSessionId !== null}
-                                        className="btn btn-primary rounded-pill">Ajouter la
+                                        className="btn text-white rounded-pill"
+                                        style={{
+                                            borderColor: 'var(--Bleu, #054A81)',
+                                            backgroundColor: 'var(--Bleu, #054A81)',
+                                        }}>Ajouter la
                                     session
                                 </button>
                         }

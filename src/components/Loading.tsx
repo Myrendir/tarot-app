@@ -14,7 +14,7 @@ const Loading: React.FC = () => {
         left: 0,
         backgroundColor: 'rgba(255,255,255,0.9)',
         zIndex: 1000,
-        color: '#007bff'
+        color: 'var(--Bleu, #054A81)'
     };
 
     const iconStyle: React.CSSProperties = {

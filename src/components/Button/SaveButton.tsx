@@ -12,7 +12,7 @@ const styles: { button: CSSProperties } = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#007bff',
+        backgroundColor: 'var(--Bleu, #054A81)',
         color: 'white',
         border: 'none',
         boxShadow: '0px 0px 10px rgba(0,0,0,0.2)'

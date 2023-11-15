@@ -25,15 +25,19 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({children}) => {
             <div className={"mb-2"}></div>
             <div className="navbar navbar-expand-lg navbar-light bg-light border-top fixed-bottom mt-5">
                 <div className="d-flex justify-content-around w-100">
-                    <Link className="nav-link mt-2" to="/"><FontAwesomeIcon icon={faHome}
-                                                                            size="xl"
-                                                                            className={getSelectedColor(location.pathname, ['/'])}/></Link>
-                    <Link className="nav-link" to="/session"><FontAwesomeIcon icon={faPlayCircle}
-                                                                              size="3x"
-                                                                              className={getSelectedColor(location.pathname, ['/session', '/session/'])}/></Link>
-                    <Link className="nav-link mt-2" to="/stats"><FontAwesomeIcon icon={faTrophy}
-                                                                                 size="xl"
-                                                                                 className={getSelectedColor(location.pathname, ['/stats'])}/></Link>
+                    <Link className="nav-link mt-2"
+                          style={{color: 'var(--Bleu, #054A81)'}}
+                          to="/"><FontAwesomeIcon icon={faHome}
+                                                  size="xl"
+                                                  className={getSelectedColor(location.pathname, ['/'])}/></Link>
+                    <Link className="nav-link" style={{color: 'var(--Bleu, #054A81)'}} to="/session"><FontAwesomeIcon
+                        icon={faPlayCircle}
+                        size="3x"
+                        className={getSelectedColor(location.pathname, ['/session', '/session/'])}/></Link>
+                    <Link className="nav-link mt-2" style={{color: 'var(--Bleu, #054A81)'}} to="/stats"><FontAwesomeIcon
+                        icon={faTrophy}
+                        size="xl"
+                        className={getSelectedColor(location.pathname, ['/stats'])}/></Link>
                 </div>
             </div>
         </div>
