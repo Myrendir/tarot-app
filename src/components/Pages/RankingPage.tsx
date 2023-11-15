@@ -196,19 +196,24 @@ const RankingPage = () => {
 
                                         {
                                             playerStats.bets ?
-                                                <div className={"card mt-2 mb-5 d-flex flex-row justify-content-around"}
-                                                     style={{borderRadius: "14px"}}>
-                                                    {playerStats.bets.map((bet: any, index: number) => (
-                                                        <div className="text-center d-flex flex-column"
-                                                             style={{
-                                                                 borderRight: index !== playerStats.bets.length - 1 ? '1px solid #DDD' : '',
-                                                                 borderStartEndRadius: index !== playerStats.bets.length - 1 ? '14px' : '',
-                                                                 paddingRight: index !== playerStats.bets.length - 1 ? '10px' : '',
-                                                             }}>
-                                                            <p style={{fontWeight: "bold"}}>{getBetLabel(bet.bet)}</p>
-                                                            <h5 style={{color: `${getBetColor(playerStats.bets, bet)}`, fontWeight: "bold"}}>{bet.percentage}%</h5>
-                                                        </div>
-                                                    ))}
+                                                <div className="d-flex justify-content-center">
+                                                    <div className={"card mt-2 mb-5 d-flex flex-row justify-content-around"}
+                                                         style={{borderRadius: "14px"}}>
+                                                        {playerStats.bets.map((bet: any, index: number) => (
+                                                            <div className="text-center d-flex flex-column"
+                                                                 style={{
+                                                                     borderRight: index !== playerStats.bets.length - 1 ? '1px solid #DDD' : '',
+                                                                     borderStartEndRadius: index !== playerStats.bets.length - 1 ? '14px' : '',
+                                                                     padding: "0 8px",
+                                                                 }}>
+                                                                <p style={{fontWeight: "bold"}}>{getBetLabel(bet.bet)}</p>
+                                                                <h5 style={{
+                                                                    color: `${getBetColor(playerStats.bets, bet)}`,
+                                                                    fontWeight: "bold"
+                                                                }}>{bet.percentage}%</h5>
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                                 : null
                                         }
