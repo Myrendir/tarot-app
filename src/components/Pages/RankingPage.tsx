@@ -75,9 +75,9 @@ const RankingPage = () => {
             case 'g':
                 return 'Garde';
             case 'gs':
-                return 'G. sans';
+                return 'Sans';
             case 'gc':
-                return 'G. contre';
+                return 'Contre';
             default:
                 return '';
         }
