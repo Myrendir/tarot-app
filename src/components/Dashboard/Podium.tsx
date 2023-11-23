@@ -24,7 +24,6 @@ const Podium = ({players, dataKey, percentage, title}: PodiumProps) => {
 
     const topThree = players.slice(0, 3);
 
-
     const getFullName = (player: PlayerPodium) => {
         return `${player.firstname} ${player.lastname.charAt(0).toUpperCase()}.`;
     }
@@ -44,7 +43,6 @@ const Podium = ({players, dataKey, percentage, title}: PodiumProps) => {
             .filter(indices => indices.length > 1)
             .flat();
     }
-
 
     const getStep = (indices: number[], defaultStep: number, playerIndex: number): number => {
         if (indices.length === 2) {

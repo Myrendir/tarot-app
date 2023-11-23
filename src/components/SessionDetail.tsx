@@ -18,6 +18,7 @@ import PumpkinIco from "./Icons/seasons/PumpkinIco";
 import FlowerIco from "./Icons/seasons/FlowerIco";
 import SnowIco from "./Icons/seasons/SnowIco";
 import SunIco from "./Icons/seasons/SunIco";
+import SeasonTitle from "./SeasonTitle";
 
 const SessionDetail: React.FC = () => {
     const {id} = useParams<{ id: string }>();
@@ -281,11 +282,7 @@ const SessionDetail: React.FC = () => {
         <MobileLayout>
             {isLoading && <Loading/>}
             <div className="container mt-4">
-                <h6 className="mb-4 d-flex justify-content-center align-items-center">
-                    <div>{getSeasonIcon(session?.season)}</div>
-                    <div>&nbsp;{getSeasonLabel(session?.season)}&nbsp;</div>
-                    <div>{getSeasonIcon(session?.season)}</div>
-                </h6>
+                <SeasonTitle season={session?.season as Season}/>
                 <table className="table table-bordered mb-4" onClick={() => setModalOpen(true)}>
                     <thead>
                     <tr>
@@ -379,46 +376,7 @@ const SessionDetail: React.FC = () => {
                 >
                     <h4>Tableau des scores</h4>
 
-                    <div style={{display: 'flex', alignItems: 'center', overflow: 'hidden'}}>
-                        {offset < 0 &&
-                            <button className='btn' onClick={handleLeftSlide}><BsFillArrowLeftCircleFill size={20}/>
-                            </button>} {/* Left arrow */}
-                        {/*
-                        <div className="mb-4" style={{overflowX: 'auto', flexGrow: 1}}>
-                            <table className="table table-bordered"
-                                   style={{transform: `translateX(${offset}px)`, transition: 'transform 0.3s'}}>
-                                <thead>
-                                <tr>
-                                    <th className={'text-center'}>Joueur</th>
-                                    {sessionPoints.map((_, index) => (
-                                        <th className={'text-center'}
-                                            key={index}>{index === 0 ? "Score actuel" : `Partie ${sessionPoints.length - index}`}</th>
-                                    ))}
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {session?.players.map(playerSession => (
-                                    <tr key={playerSession.player._id}>
-                                        <td className="font-weight-light">{playerSession.player.username}</td>
-                                        {sessionPoints.map((pointsForGame, index) => (
-                                            <td key={index}>{pointsForGame[playerSession.player.username]}</td>
-                                        ))}
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
-                        </div>
 
-                        <button className='btn' onClick={handleRightSlide}><BsFillArrowRightCircleFill size={20}/>
-                        </button>
-                    </div>*/}
-
-                        <h1>Cette modal n'existe pas</h1>
-                    </div>
-                    {/*place button bottom left*/}
-                    <div className={'float-right'}>
-                        <button className="btn btn-warning" onClick={() => setModalOpen(false)}>Fermer</button>
-                    </div>
                 </Modal>
 
 

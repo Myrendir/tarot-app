@@ -6,7 +6,8 @@ import '../podium.css';
 import Loading from "../Loading";
 import Widget from "../Dashboard/Widget";
 import Podium from "../Dashboard/Podium";
-import {getSeason} from "../../model/Session";
+import {getSeason, Season} from "../../model/Session";
+import SeasonTitle from "../SeasonTitle";
 
 
 const HomePage = () => {
@@ -16,6 +17,7 @@ const HomePage = () => {
     const [topWinrate, setTopWinrate] = useState<any>([]);
     const [topAveragePoints, setTopAveragePoints] = useState<any>([]);
     const [topGWinrate, setTopGWinrate] = useState<any>([]);
+    const [topStarred, setTopStarred] = useState<any>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const currentSeason = getSeason(new Date());
@@ -63,21 +65,37 @@ const HomePage = () => {
             .catch(error => {
                 console.error("Error fetching top g winrate:", error);
             });
+
+        api.get('/stats/topStarred/')
+            .then(response => {
+                setTopStarred(response.data);
+            })
+            .catch(error => {
+                console.error("Error fetching top starred:", error);
+            });
         setIsLoading(false);
     }, []);
 
-    console.log(mostGamesTaken)
+    console.log(topStarred)
     return (
         <MobileLayout>
             {
                 isLoading ? <Loading/> :
                     <div className="container mt-4">
-
+                        <SeasonTitle season={currentSeason as Season}/>
                         <div className="row">
                             {mostPointsCumulated.length > 2 ?
                                 <Widget children={<Podium players={mostPointsCumulated}
                                                           dataKey={'totalPoints'} title={'Top points cumulés'}/>}
                                         title={'Top points cumulés'}/> : null}
+                            {
+                                topStarred.length > 2 ?
+                                    <Widget children={<Podium players={topStarred}
+                                                              dataKey={'starsCount'}
+                                                              title={'Top étoilés'}
+                                    />}
+                                            title={'Top étoilés'}/> : null
+                            }
                             {mostGamesTaken.length > 2 ?
                                 <Widget children={<Podium players={mostGamesTaken}
                                                           dataKey={'count'}
