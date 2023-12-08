@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import '../podium.css';
-import {Modal, Button} from 'react-bootstrap';
+import {Modal} from 'react-bootstrap';
+import {getPlayerFullname} from "../../model/Player";
 
 type PlayerPodium = {
     firstname: string,
@@ -13,9 +14,10 @@ type PodiumProps = {
     dataKey: string,
     percentage?: boolean,
     title: string
+    color: string,
 }
 
-const Podium = ({players, dataKey, percentage, title}: PodiumProps) => {
+const Podium = ({players, dataKey, percentage, title, color}: PodiumProps) => {
 
     const [showModal, setShowModal] = useState(false);
 
@@ -24,78 +26,113 @@ const Podium = ({players, dataKey, percentage, title}: PodiumProps) => {
 
     const topThree = players.slice(0, 3);
 
-    const getFullName = (player: PlayerPodium) => {
-        return `${player.firstname} ${player.lastname.charAt(0).toUpperCase()}.`;
-    }
+    /*   const getEqualScoreIndices = (players: PlayerPodium[], key: string): number[] => {
+           const scores = players.map(player => player[key]);
+           const scoreOccurrences: { [key: number]: number[] } = {};
 
-    const getEqualScoreIndices = (players: PlayerPodium[], key: string): number[] => {
-        const scores = players.map(player => player[key]);
-        const scoreOccurrences: { [key: number]: number[] } = {};
+           scores.forEach((score, index) => {
+               if (!scoreOccurrences[score]) {
+                   scoreOccurrences[score] = [];
+               }
+               scoreOccurrences[score].push(index);
+           });
 
-        scores.forEach((score, index) => {
-            if (!scoreOccurrences[score]) {
-                scoreOccurrences[score] = [];
-            }
-            scoreOccurrences[score].push(index);
-        });
+           return Object.values(scoreOccurrences)
+               .filter(indices => indices.length > 1)
+               .flat();
+       }*/
 
-        return Object.values(scoreOccurrences)
-            .filter(indices => indices.length > 1)
-            .flat();
-    }
+    const renderMedalSvg = (step: number) => {
+        if (step === 1) {
+            return <svg width="41" height="42" viewBox="0 0 41 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect y="0.5" width="41" height="40.9999" rx="5" fill={color} fill-opacity="0.2"/>
+                <path d="M20.5 26C25.3325 26 29.25 22.0825 29.25 17.25C29.25 12.4175 25.3325 8.5 20.5 8.5C15.6675 8.5 11.75 12.4175 11.75 17.25C11.75 22.0825 15.6675 26 20.5 26Z"
+                      fill={color}/>
+                <path d="M19.325 15.1224L17.825 15.5874C17.675 15.4874 17.525 15.3474 17.375 15.1674C17.225 14.9874 17.15 14.7374 17.15 14.4174C17.15 13.8174 17.515 13.3974 18.245 13.1574L19.925 12.5874H20.48C20.91 12.5874 21.25 12.7124 21.5 12.9624C21.75 13.2124 21.875 13.5524 21.875 13.9824V21.7974C21.765 21.8174 21.6 21.8424 21.38 21.8724C21.17 21.9124 20.955 21.9324 20.735 21.9324C20.515 21.9324 20.315 21.9174 20.135 21.8874C19.965 21.8574 19.82 21.7974 19.7 21.7074C19.58 21.6174 19.485 21.4974 19.415 21.3474C19.355 21.1874 19.325 20.9824 19.325 20.7324V15.1224Z"
+                      fill="white"/>
+                <path d="M15.2354 25.2895C15.0303 25.1348 14.8507 24.9496 14.6889 24.75L13.8928 27.6536C13.1074 30.5185 12.7147 31.9509 13.2387 32.735C13.4224 33.0099 13.6687 33.2304 13.9546 33.376C14.7704 33.7914 16.03 33.135 18.5491 31.8224C19.3874 31.3856 19.8065 31.1672 20.2517 31.1197C20.4169 31.1022 20.5831 31.1022 20.7482 31.1197C21.1935 31.1672 21.6126 31.3856 22.4509 31.8224C24.97 33.135 26.2296 33.7914 27.0454 33.376C27.3312 33.2304 27.5776 33.0099 27.7612 32.735C28.2854 31.9509 27.8926 30.5185 27.1073 27.6536L26.4097 25.1094C26.3685 24.9591 26.1746 24.9185 26.0765 25.0395C26.0708 25.0466 26.0643 25.053 26.0573 25.0588C24.546 26.3029 22.6102 27.05 20.5 27.05C18.5236 27.05 16.7003 26.3946 15.2354 25.2895Z"
+                      fill={color}/>
+            </svg>
 
-    const getStep = (indices: number[], defaultStep: number, playerIndex: number): number => {
-        if (indices.length === 2) {
-            if (indices.includes(0) && indices.includes(1) && indices.includes(playerIndex)) {
-                return 1;
-            }
-            if (indices.includes(1) && indices.includes(2) && indices.includes(playerIndex)) {
-                return 2;
-            }
         }
+        if (step === 2) {
+            return <svg width="41" height="42" viewBox="0 0 41 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect y="0.5" width="41" height="40.9999" rx="5" fill={color} fill-opacity="0.2"/>
+                <path d="M20.5 26C25.3325 26 29.25 22.0825 29.25 17.25C29.25 12.4175 25.3325 8.5 20.5 8.5C15.6675 8.5 11.75 12.4175 11.75 17.25C11.75 22.0825 15.6675 26 20.5 26Z"
+                      fill={color}/>
+                <path d="M20.615 12.4675C21.185 12.4675 21.69 12.5425 22.13 12.6925C22.57 12.8325 22.945 13.0275 23.255 13.2775C23.565 13.5275 23.8 13.8225 23.96 14.1625C24.12 14.5025 24.2 14.8675 24.2 15.2575C24.2 16.3075 23.605 17.3075 22.415 18.2575L20.45 19.8325H24.05C24.11 19.9425 24.165 20.0825 24.215 20.2525C24.275 20.4225 24.305 20.6075 24.305 20.8075C24.305 21.1675 24.225 21.4275 24.065 21.5875C23.905 21.7375 23.695 21.8125 23.435 21.8125H18.23C18.01 21.6625 17.835 21.4725 17.705 21.2425C17.585 21.0025 17.525 20.7225 17.525 20.4025C17.525 20.0625 17.595 19.7775 17.735 19.5475C17.875 19.3075 18.03 19.1175 18.2 18.9775L20.27 17.2075C20.53 16.9875 20.745 16.7925 20.915 16.6225C21.085 16.4425 21.22 16.2825 21.32 16.1425C21.43 16.0025 21.505 15.8725 21.545 15.7525C21.595 15.6325 21.62 15.5175 21.62 15.4075C21.62 15.1275 21.495 14.9075 21.245 14.7475C21.005 14.5875 20.705 14.5075 20.345 14.5075C19.945 14.5075 19.585 14.5725 19.265 14.7025C18.955 14.8225 18.695 14.9525 18.485 15.0925C18.315 14.9725 18.175 14.8225 18.065 14.6425C17.955 14.4625 17.9 14.2525 17.9 14.0125C17.9 13.4925 18.145 13.1075 18.635 12.8575C19.125 12.5975 19.785 12.4675 20.615 12.4675Z"
+                      fill="white"/>
+                <path d="M15.2354 25.2895C15.0303 25.1348 14.8507 24.9496 14.6889 24.75L13.8928 27.6536C13.1074 30.5185 12.7147 31.9509 13.2387 32.735C13.4224 33.0099 13.6687 33.2304 13.9546 33.376C14.7704 33.7914 16.03 33.135 18.5491 31.8224C19.3874 31.3856 19.8065 31.1672 20.2517 31.1197C20.4169 31.1022 20.5831 31.1022 20.7482 31.1197C21.1935 31.1672 21.6126 31.3856 22.4509 31.8224C24.97 33.135 26.2296 33.7914 27.0454 33.376C27.3312 33.2304 27.5776 33.0099 27.7612 32.735C28.2854 31.9509 27.8926 30.5185 27.1073 27.6536L26.4097 25.1094C26.3685 24.9591 26.1746 24.9185 26.0765 25.0395C26.0708 25.0466 26.0643 25.053 26.0573 25.0588C24.546 26.3029 22.6102 27.05 20.5 27.05C18.5236 27.05 16.7003 26.3946 15.2354 25.2895Z"
+                      fill={color}/>
+            </svg>
 
-        if (indices.length === 3) {
-            return 1;
         }
+        if (step === 3) {
+            return (<svg width="41" height="42" viewBox="0 0 41 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect y="0.5" width="41" height="40.9999" rx="5" fill={color} fill-opacity="0.2"/>
+                <path d="M20.5 26C25.3325 26 29.25 22.0825 29.25 17.25C29.25 12.4175 25.3325 8.5 20.5 8.5C15.6675 8.5 11.75 12.4175 11.75 17.25C11.75 22.0825 15.6675 26 20.5 26Z"
+                      fill={color}/>
+                <path d="M20.495 12.4675C21.645 12.4675 22.52 12.7075 23.12 13.1875C23.72 13.6575 24.02 14.2925 24.02 15.0925C24.02 15.5725 23.89 15.9825 23.63 16.3225C23.38 16.6525 23.08 16.9025 22.73 17.0725C22.94 17.1525 23.135 17.2525 23.315 17.3725C23.495 17.4925 23.655 17.6425 23.795 17.8225C23.935 18.0025 24.045 18.2125 24.125 18.4525C24.205 18.6925 24.245 18.9725 24.245 19.2925C24.245 19.7225 24.15 20.1075 23.96 20.4475C23.78 20.7875 23.525 21.0775 23.195 21.3175C22.865 21.5575 22.47 21.7375 22.01 21.8575C21.56 21.9875 21.065 22.0525 20.525 22.0525C19.485 22.0525 18.7 21.9075 18.17 21.6175C17.64 21.3275 17.375 20.9575 17.375 20.5075C17.375 20.2375 17.44 20.0075 17.57 19.8175C17.7 19.6175 17.86 19.4625 18.05 19.3525C18.25 19.4925 18.515 19.6425 18.845 19.8025C19.185 19.9525 19.625 20.0275 20.165 20.0275C20.675 20.0275 21.05 19.9375 21.29 19.7575C21.54 19.5775 21.665 19.3425 21.665 19.0525C21.665 18.7625 21.565 18.5425 21.365 18.3925C21.175 18.2425 20.84 18.1675 20.36 18.1675H18.95C18.88 18.0575 18.82 17.9225 18.77 17.7625C18.72 17.6025 18.695 17.4125 18.695 17.1925C18.695 16.9625 18.715 16.7675 18.755 16.6075C18.805 16.4375 18.87 16.2975 18.95 16.1875H20.36C21.08 16.1875 21.44 15.9125 21.44 15.3625C21.44 15.1025 21.325 14.8925 21.095 14.7325C20.865 14.5725 20.52 14.4925 20.06 14.4925C19.65 14.4925 19.29 14.5425 18.98 14.6425C18.67 14.7325 18.415 14.8475 18.215 14.9875C18.045 14.8675 17.905 14.7225 17.795 14.5525C17.685 14.3725 17.63 14.1625 17.63 13.9225C17.63 13.4225 17.89 13.0575 18.41 12.8275C18.93 12.5875 19.625 12.4675 20.495 12.4675Z"
+                      fill="white"/>
+                <path d="M15.2354 25.2895C15.0303 25.1348 14.8507 24.9496 14.6889 24.75L13.8928 27.6536C13.1074 30.5185 12.7147 31.9509 13.2387 32.735C13.4224 33.0099 13.6687 33.2304 13.9546 33.376C14.7704 33.7914 16.03 33.135 18.5491 31.8224C19.3874 31.3856 19.8065 31.1672 20.2517 31.1197C20.4169 31.1022 20.5831 31.1022 20.7482 31.1197C21.1935 31.1672 21.6126 31.3856 22.4509 31.8224C24.97 33.135 26.2296 33.7914 27.0454 33.376C27.3312 33.2304 27.5776 33.0099 27.7612 32.735C28.2854 31.9509 27.8926 30.5185 27.1073 27.6536L26.4097 25.1094C26.3685 24.9591 26.1746 24.9185 26.0765 25.0395C26.0708 25.0466 26.0643 25.053 26.0573 25.0588C24.546 26.3029 22.6102 27.05 20.5 27.05C18.5236 27.05 16.7003 26.3946 15.2354 25.2895Z"
+                      fill={color}/>
+            </svg>)
 
-        return defaultStep
+        }
+        return null;
     }
 
     return (
         <>
-            <div className="podium">
-                <div className={`podium-${getStep(getEqualScoreIndices(topThree, dataKey), 2, 1)}`}>
-                    <span className="podium-name">{topThree[1] && getFullName(topThree[1])}</span>
-                    {percentage ? `${topThree[1][dataKey].toFixed(2)}% ` : (Math.round(topThree[1][dataKey]))}
-                    {(topThree[1].totalGames ? ` (${topThree[1].totalGames})` : null)}
+            <div>
+                {
+                    topThree.map((player, index) => (
+                        <div className="card card-body mb-3" style={{
+                            borderRadius: '10px',
+                        }}>
+                            <div className="d-flex">
+                                <div className="mr-4">{renderMedalSvg(index + 1)}</div>
+                                <div><b>{player && getPlayerFullname(player)}</b></div>
+                            </div>
+                            <h3 style={{
+                                color: color,
+                                fontWeight: 'bolder',
+                                textAlign: 'center'
+
+                            }}>{percentage ? `${player[dataKey].toFixed(2)}% ` : (Math.round(player[dataKey]))}
+                                {(player.totalGames ? ` (${player.totalGames})` : null)}</h3>
+                        </div>
+                    ))
+                }
+                <div className="d-flex justify-content-end">
+                    <button
+                        className="btn text-white"
+                        onClick={handleShowModal}
+                        style={{
+                            backgroundColor: color,
+                            borderRadius: '10px',
+                            borderColor: "white",
+                            fontSize: '80%'
+                        }}
+                    >
+                        Voir tout
+                    </button>
                 </div>
-                <div className={`podium-${getStep(getEqualScoreIndices(topThree, dataKey), 1, 0)}`}>
-                    <span className="podium-name">{topThree[0] && getFullName(topThree[0])}</span>
-                    {percentage ? `${topThree[0][dataKey].toFixed(2)}% ` : (Math.round(topThree[0][dataKey]))}
-                    {(topThree[0].totalGames ? ` (${topThree[0].totalGames})` : null)}
-                </div>
-                <div className={`podium-${getStep(getEqualScoreIndices(topThree, dataKey), 3, 2)}`}>
-                    <span className="podium-name">{topThree[2] && getFullName(topThree[2])}</span>
-                    {percentage ? `${topThree[2][dataKey].toFixed(2)}% ` : (Math.round(topThree[2][dataKey]))}
-                    {(topThree[2].totalGames ? ` (${topThree[2].totalGames})` : null)}
-                </div>
-            </div>
-            <div className="d-flex justify-content-end">
-                <button
-                    className="btn btn-outline-primary btn-sm mt-2"
-                    onClick={handleShowModal}
-                >
-                    Voir le classement complet
-                </button>
             </div>
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header>
-                    <Modal.Title>{title}</Modal.Title>
+                    <Modal.Title style={{
+                        fontWeight: 'bold'
+
+                    }}>{title}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body style={{maxHeight: '60vh', overflowY: 'auto'}}>
-                    <table className="table">
-                        <thead>
-                        <tr>
+                    <table className="table table-borderless">
+                        <thead style={{
+                            backgroundColor: color,
+                            color: 'white'
+                        }}>
+                        <tr className={"text-center"}>
                             <th>Position</th>
                             <th>Nom</th>
                             <th>Score</th>
@@ -103,24 +140,29 @@ const Podium = ({players, dataKey, percentage, title}: PodiumProps) => {
                         </thead>
                         <tbody>
                         {players.map((player, index) => (
-                            <tr key={index}>
+                            <tr key={index} className={"text-center"}>
                                 <td>
-                                    {index === 0 && <span role="img" aria-label="gold medal">🥇</span>}
-                                    {index === 1 && <span role="img" aria-label="silver medal">🥈</span>}
-                                    {index === 2 && <span role="img" aria-label="bronze medal">🥉</span>}
+                                    {renderMedalSvg(index + 1)}
                                     {index > 2 ? index + 1 : null}
                                 </td>
-                                <td>{getFullName(player)}</td>
-                                <td>{(percentage || dataKey === 'averagePoints') ? player[dataKey].toFixed(2) : player[dataKey]}</td>
+                                <td>{getPlayerFullname(player)}</td>
+                                <td
+                                    style={{
+                                        color: color,
+                                        fontWeight: 'bold'
+                                    }}>{(percentage || dataKey === 'averagePoints') ? player[dataKey].toFixed(2) : player[dataKey]}</td>
                             </tr>
                         ))}
                         </tbody>
                     </table>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="warning" onClick={handleCloseModal}>
+                    <button className="btn text-white" style={{
+                        backgroundColor: color, borderRadius: '10px',
+                        borderColor: "white",
+                    }} onClick={handleCloseModal}>
                         Fermer
-                    </Button>
+                    </button>
                 </Modal.Footer>
             </Modal>
         </>

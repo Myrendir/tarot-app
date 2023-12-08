@@ -17,3 +17,13 @@ export type PlayerStats = {
     totalPoints: number,
     averagePointsPerGame: number
 }
+
+export type PlayerPodium = {
+    firstname: string,
+    lastname: string,
+    [key: string]: any
+}
+
+export const getPlayerFullname = (player: Player | PlayerPodium) => {
+    return `${player.firstname} ${player.lastname.charAt(0).toUpperCase()}.`;
+}

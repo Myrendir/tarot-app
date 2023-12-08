@@ -21,7 +21,7 @@ const SeasonTitle = ({season}: { season: Season }) => {
     return (
         <h6 className="mb-4 d-flex justify-content-center align-items-center">
             <div>{getSeasonIcon(season)}</div>
-            <div>&nbsp;{getSeasonLabel(season)}&nbsp;</div>
+            <div>&nbsp;Saison {getSeasonLabel(season)}&nbsp;</div>
             <div>{getSeasonIcon(season)}</div>
         </h6>
     )

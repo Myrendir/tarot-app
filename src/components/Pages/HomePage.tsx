@@ -76,7 +76,6 @@ const HomePage = () => {
         setIsLoading(false);
     }, []);
 
-    console.log(topStarred)
     return (
         <MobileLayout>
             {
@@ -84,45 +83,42 @@ const HomePage = () => {
                     <div className="container mt-4">
                         <SeasonTitle season={currentSeason as Season}/>
                         <div className="row">
-                            {mostPointsCumulated.length > 2 ?
-                                <Widget children={<Podium players={mostPointsCumulated}
-                                                          dataKey={'totalPoints'} title={'Top points cumulés'}/>}
-                                        title={'Top points cumulés'}/> : null}
+                            {
+                                mostPointsCumulated.length > 2 ?
+                                    <Widget children={<Podium players={mostPointsCumulated}
+                                                              dataKey={'totalPoints'}
+                                                              title={'Top points cumulés'}
+                                                              color={'var(--Bleu, #054A81)'}/>}
+                                            title={'Top points cumulés'} color={'var(--Bleu, #054A81)'}/> : null
+                            }
+
                             {
                                 topStarred.length > 2 ?
                                     <Widget children={<Podium players={topStarred}
                                                               dataKey={'starsCount'}
                                                               title={'Top étoilés'}
+                                                              color={'var(--Vert, #48972C)'}
                                     />}
-                                            title={'Top étoilés'}/> : null
+                                            title={'Top étoilés'} color={'var(--Vert, #48972C)'}/> : null
                             }
                             {mostGamesTaken.length > 2 ?
                                 <Widget children={<Podium players={mostGamesTaken}
                                                           dataKey={'count'}
-                                                          title={'Top preneurs'}/>}
-                                        title={'Top preneurs'}/> : null}
+                                                          title={'Top preneurs'}
+                                                          color={'var(--Rose, #E48F8A)'}/>}
+                                        title={'Top preneurs'} color={'var(--Rose, #E48F8A)'}/> : null}
                             {mostGamesCalled.length > 2 ?
                                 <Widget children={<Podium players={mostGamesCalled}
                                                           dataKey={'count'}
-                                                          title={'Top appelés'}/>}
-                                        title={'Top appelés'}/> : null}
+                                                          title={'Top appelés'} color={'var(--Bleu-clair, #7FBCBD)'}/>}
+                                        title={'Top appelés'} color={'var(--Bleu-clair, #7FBCBD)'}/> : null}
                             {topWinrate.length > 2 ?
                                 <Widget children={<Podium players={topWinrate}
                                                           dataKey={'winPercentage'}
                                                           title={'Top winrate preneurs'}
-                                                          percentage={true}/>}
-                                        title={'Top winrate preneurs'}/> : null}
-                            {topAveragePoints.length > 2 ?
-                                <Widget children={<Podium players={topAveragePoints}
-                                                          dataKey={'averagePoints'}
-                                                          title={'Top moyenne de points par partie'}/>}
-                                        title={'Top moyenne de points par partie'}/> : null}
-                            {topGWinrate.length > 2 ?
-                                <Widget children={<Podium players={topGWinrate}
-                                                          dataKey={'winrate'}
-                                                          title={'Top winrate garde'}
-                                                          percentage={true}/>}
-                                        title={'Top winrate garde'}/> : null}
+                                                          percentage={true} color={'var(--Orange, #E55D35)'}/>}
+                                        title={'Top winrate preneurs'} color={'var(--Orange, #E55D35)'}/> : null}
+
 
                         </div>
                     </div>
