@@ -1,10 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {
     sessionAdded,
     startLoading,
     sessionError,
-    getVisitedSessionIdsFromLocalStorage, removeSessionIdFromLocalStorage,
 } from '../../store/sessionSlice';
 import {RootState} from "../../store";
 import {playerError, playersReceived, startLoadingPlayers} from "../../store/playerSlice";
@@ -15,6 +14,7 @@ import {toastr} from "react-redux-toastr";
 import {Session, SessionPlayer} from "../../model/Session";
 import Loading from "../Loading";
 import SelectPlayerComponent from "./SelectPlayerComponent";
+import {getPlayerFullname} from "../../model/Player";
 
 const AddSession: React.FC = () => {
     const dispatch = useDispatch();
@@ -25,148 +25,133 @@ const AddSession: React.FC = () => {
         games: [],
         players: Array(5).fill(null),
     });
-    const ids = getVisitedSessionIdsFromLocalStorage();
-
-    const [foundSessionId, setFoundSessionId] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingData, setIsLoadingData] = useState(true);
+    const [hasExistingSession, setHasExistingSession] = useState<boolean>(false);
     const [sessions, setSessions] = useState<Session[]>([]);
-    const getVisitedSession = async () => {
-        let localSessions = [...sessions];
 
-        const fetchSessionPromises = ids.map(async (id: string) => {
-            if (!localSessions.find((s: Session) => s._id === id)) {
-                try {
-                    const response = await api.get(`/session/${id}`);
-                    const playerDetailsPromises = response.data.players.map((p: {
-                        player: string;
-                    }) => api.get(`/player/${p.player}`));
-                    const playersDetails = await Promise.all(playerDetailsPromises);
-                    const completeSessionData = {
-                        ...response.data,
-                        players: response.data.players.map((p: SessionPlayer, index: number) => ({
-                            ...p,
-                            player: playersDetails[index].data.data
-                        })),
-                    };
+    const fetchPlayers = async () => {
+        try {
+            dispatch(startLoadingPlayers());
 
-                    if (localSessions.find((s: Session) => s._id === completeSessionData._id)) {
-                        localSessions = [...localSessions.filter((s: Session) => s._id !== completeSessionData._id), completeSessionData];
-                    } else {
-                        localSessions = [...localSessions, completeSessionData];
-                    }
+            const response = await api.get('/player/');
 
-                } catch (error: any) {
-                    if (
-                        error.response
-                        && error.response.status === 404
-                        && error.response.data
-                    ) {
-                        removeSessionIdFromLocalStorage(error.response.data._id);
-                    }
-                    dispatch(sessionError(error.message));
-                }
+            if (response.status !== 200) {
+                throw new Error(response.data.message);
             }
-        });
 
-        await Promise.all(fetchSessionPromises);
-
-        const filteredArray = ids.filter(function (e: any, pos: any) {
-            return ids.indexOf(e) == pos;
-        });
-
-        localSessions = localSessions.sort((a: Session, b: Session) => {
-            return filteredArray.indexOf(a._id) - filteredArray.indexOf(b._id);
-        });
-
-        setSessions(localSessions);
-        setIsLoading(false);
-    }
-
+            dispatch(playersReceived(response.data));
+        } catch (error: any) {
+            dispatch(playerError(error.message));
+        }
+    };
 
     useEffect(() => {
-        getVisitedSession();
-        // eslint-disable-next-line
-    }, []);
-
-    const getSessionResume = (session: Session) => {
-
-        const players = session.players.map((p: SessionPlayer) => p.player.firstname + ' ' + p.player.lastname.charAt(0).toUpperCase()).join(', ');
-        const games = `${session.games.length} ${session.games.length > 1 ? 'parties' : 'partie'}`;
-        return (
-            <div>
-                <i className='fa fa-arrow-right'></i> Avec {players} en {games}
-            </div>
-        );
-
-    }
-
-    const players = useSelector((state: RootState) => state.player.players);
-    useEffect(() => {
-        const fetchPlayers = async () => {
-            try {
-                dispatch(startLoadingPlayers());
-
-                const response = await api.get('/player/');
-
-                if (response.status !== 200) {
-                    throw new Error(response.data.message);
-                }
-
-                dispatch(playersReceived(response.data));
-            } catch (error: any) {
-                dispatch(playerError(error.message));
-            }
-        };
-
         fetchPlayers();
     }, [dispatch]);
 
     useEffect(() => {
         const checkExistingSession = async () => {
             try {
-                const response = await api.get('/session/check', {
-                    params: {
-                        players: formData.players.filter(p => p !== null),
-                    },
-                });
+                const selectedPlayers = formData.players.filter(p => p !== null);
 
-                if (response.status === 200 && response.data.sessionId) {
-                    setFoundSessionId(response.data.sessionId);
+                if (selectedPlayers.length === 5) {
+                    const response = await api.get('/session/check', {
+                        params: {
+                            players: selectedPlayers,
+                        },
+                    });
+
+                    if (response.status === 200 && response.data.sessionId) {
+                        setHasExistingSession(true);
+                    } else {
+                        setHasExistingSession(false);
+                    }
                 } else {
-                    setFoundSessionId(null);
+                    setHasExistingSession(false);
                 }
             } catch (error) {
                 console.error("Error checking for existing session:", error);
             }
         };
 
-        if (formData.players.every(p => p !== null)) {
-            checkExistingSession();
-        } else {
-            setFoundSessionId(null);
-        }
+        checkExistingSession();
     }, [formData.players]);
+
+    const players = useSelector((state: RootState) => state.player.players);
+
+    const selectOptions = useMemo(() => {
+        return players.map(player => ({
+            value: player._id,
+            label: `${player.firstname} ${player.lastname.charAt(0)}.`,
+        }));
+    }, [players])
+
+
+    const getVisitedSessions = async () => {
+
+        setIsLoadingData(true);
+        try {
+            const response = await api.get('/session/latest');
+            const sessionData = response.data;
+            const fullSessions = await Promise.all(sessionData.map(async (session: any) => {
+                const playerDetailsPromises = session.players.map((p: {
+                    player: string
+                }) => api.get('/player/' + p.player));
+                const playersDetails = await Promise.all(playerDetailsPromises);
+
+                return {
+                    ...session,
+                    players: session.players.map((p: SessionPlayer, index: number) => ({
+                        ...p,
+                        player: playersDetails[index].data.data
+                    })),
+                    games: session.games,
+                };
+            }));
+
+            setSessions(fullSessions);
+            setIsLoadingData(false);
+        } catch (error) {
+            console.error("Error fetching latest sessions:", error);
+        }
+    };
+
+    useEffect(() => {
+        getVisitedSessions();
+    }, []);
+
+    const getSessionResume = (session: Session) => {
+        const players = session.players.map((p: SessionPlayer) => getPlayerFullname(p.player)).join(', ');
+        return (
+            <div className="d-flex justify-content-between">
+                <div className="p-2">{players}</div>
+                <div className="align-items-center p-3" style={{
+                    backgroundColor: 'var(--Bleu, #054A81)',
+                    borderRadius: '0 15px 15px 0',
+                }}>
+                    <i className="fa fa-chevron-right text-white"></i>
+                </div>
+            </div>
+        );
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // check if there is 5 players
         if (formData.players.filter(p => p !== null).length < 5) {
             toastr.error('Erreur', 'Il faut 5 joueurs pour créer une session.');
+            return;
         }
 
-
-        if (foundSessionId) {
-            window.location.href = `/session/${foundSessionId}`;
+        if (hasExistingSession) {
+            window.location.href = `/session/${formData.players.map((p: any) => p._id).join(',')}`;
             return;
         }
 
         try {
             dispatch(startLoading());
 
-            const response = await api.post('/session',
-                JSON.stringify(formData),
-            );
+            const response = await api.post('/session', JSON.stringify(formData));
 
             const data = await response;
 
@@ -178,16 +163,9 @@ const AddSession: React.FC = () => {
         }
     };
 
-    const selectOptions = players.map(player => ({
-        value: player._id,
-        label: `${player.firstname} ${player.lastname.charAt(0)}.`,
-    }));
-
     return (
         <MobileLayout>
-            {
-                isLoading ? <Loading/> : ''
-            }
+            {isLoadingData ? <Loading/> : ''}
             <div className='container mt-4'>
                 <h1 className="text-center mb-4">Choix de la session</h1>
                 <form onSubmit={handleSubmit}>
@@ -204,12 +182,13 @@ const AddSession: React.FC = () => {
 
                     <div className="d-flex justify-content-center pt-3">
                         {
-                            foundSessionId ? <div>
+                            hasExistingSession ? <div>
                                     <Link className="btn btn-warning rounded-pill text-white"
-                                          to={`/session/${foundSessionId}`}>Utiliser la session existante</Link>
+                                          to={`/session/${formData.players.map((p: any) => p._id).join(',')}`}>Utiliser la
+                                        session existante</Link>
                                 </div> :
                                 <button type="submit"
-                                        disabled={foundSessionId !== null}
+                                        disabled={hasExistingSession}
                                         className="btn text-white rounded-pill"
                                         style={{
                                             borderColor: 'var(--Bleu, #054A81)',
@@ -221,15 +200,18 @@ const AddSession: React.FC = () => {
                     </div>
                 </form>
                 {
-                    ids.length > 0 &&
+                    sessions.length > 0 &&
                     <div className="mt-4">
-                        <h4 className="text-center mb-4">Sessions récemment consultées</h4>
+                        <h4 className="text-center mb-4">Sessions récentes</h4>
                         <div className="list-group">
                             {
                                 sessions.map((session: Session) => (
                                     <Link key={session._id}
                                           to={`/session/${session._id}`}
-                                          className="list-group-item list-group-item-action mb-2 rounded">
+                                          className="card border mb-2" style={{
+                                        borderRadius: '15px',
+                                        color: 'var(--Bleu, #054A81)',
+                                    }}>
                                         {getSessionResume(session)}
                                     </Link>
                                 ))

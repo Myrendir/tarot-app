@@ -13,6 +13,8 @@ export interface Session {
 
 export type SessionPlayer = {
     player: Player,
+    firstname?: string,
+    lastname?: string,
     score: number,
 }
 

@@ -10,7 +10,6 @@ import SaveButton from "./Button/SaveButton";
 import {toastr} from "react-redux-toastr";
 import ResetButton from "./Button/ResetButton";
 import Loading from "./Loading";
-import {addSessionIdToLocalStorage} from "../store/sessionSlice";
 import {FaCrown, FaStar} from 'react-icons/fa'
 import {BsFillArrowLeftCircleFill} from 'react-icons/bs'
 import {Player} from "../model/Player";
@@ -22,8 +21,6 @@ import SeasonTitle from "./SeasonTitle";
 
 const SessionDetail: React.FC = () => {
     const {id} = useParams<{ id: string }>();
-
-    addSessionIdToLocalStorage(id);
 
     const [session, setSession] = useState<Session | null>(null);
     const [bet, setBet] = useState('');
