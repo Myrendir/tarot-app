@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import MobileLayout from "../../Layout/MobileLayout";
 import api from "../../services/api";
 
-import '../podium.css';
 import Loading from "../Loading";
 import Widget from "../Dashboard/Widget";
 import Podium from "../Dashboard/Podium";
@@ -15,15 +14,13 @@ const HomePage = () => {
     const [mostGamesCalled, setMostGamesCalled] = useState<any>([]);
     const [mostPointsCumulated, setMostPointsCumulated] = useState<any>([]);
     const [topWinrate, setTopWinrate] = useState<any>([]);
-    const [topAveragePoints, setTopAveragePoints] = useState<any>([]);
-    const [topGWinrate, setTopGWinrate] = useState<any>([]);
     const [topStarred, setTopStarred] = useState<any>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const currentSeason = getSeason(new Date());
 
     useEffect(() => {
-
+        console.log(new Date())
         api.get('/stats/gamesTaken/' + currentSeason)
             .then(response => {
                 setMostGamesTaken(response.data);
@@ -52,20 +49,6 @@ const HomePage = () => {
             }).catch(error => {
             console.error("Error fetching top winrate:", error);
         })
-        api.get('/stats/bestAveragePointsPerGame/' + currentSeason)
-            .then(response => {
-                setTopAveragePoints(response.data);
-            }).catch(error => {
-            console.error("Error fetching top average points:", error);
-        })
-        api.get('/stats/mostWinrateForBet/g/' + currentSeason)
-            .then(response => {
-                setTopGWinrate(response.data);
-            })
-            .catch(error => {
-                console.error("Error fetching top g winrate:", error);
-            });
-
         api.get('/stats/topStarred/')
             .then(response => {
                 setTopStarred(response.data);
@@ -74,7 +57,7 @@ const HomePage = () => {
                 console.error("Error fetching top starred:", error);
             });
         setIsLoading(false);
-    }, []);
+    }, [currentSeason]);
 
     return (
         <MobileLayout>

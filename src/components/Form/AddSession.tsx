@@ -47,6 +47,7 @@ const AddSession: React.FC = () => {
 
     useEffect(() => {
         fetchPlayers();
+        // eslint-disable-next-line
     }, [dispatch]);
 
     useEffect(() => {

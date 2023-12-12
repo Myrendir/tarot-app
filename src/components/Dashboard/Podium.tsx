@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-import '../podium.css';
 import {Modal} from 'react-bootstrap';
 import {getPlayerFullname} from "../../model/Player";
 
