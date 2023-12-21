@@ -7,7 +7,7 @@ import Widget from "../Dashboard/Widget";
 import Podium from "../Dashboard/Podium";
 import {getSeason, isLastDayOfSeason, Season} from "../../model/Session";
 import SeasonTitle from "../SeasonTitle";
-
+import {FaMedal} from "react-icons/fa";
 
 const HomePage = () => {
     const [mostGamesTaken, setMostGamesTaken] = useState<any>([]);
@@ -69,11 +69,16 @@ const HomePage = () => {
                             {
                                 isFinal ? <button type={"button"}
                                                   className={"btn text-white mb-3"}
-                                                  style={{backgroundColor: 'var(--Bleu, #054A81)'}}
+                                                  style={{backgroundColor: 'var(--Bleu, #054A81)', borderRadius: '15px'}}
                                                   onClick={() => {
                                                       setIsFinal(false);
                                                   }}>
+                                        <FaMedal className={'mr-1'}/>
+
+                                        <span className={'mr-1'}>
                                         Finale
+                                    </span>
+                                        <FaMedal/>
                                     </button>
                                     :
                                     <div onClick={() => {
