@@ -5,7 +5,7 @@ import api from "../../services/api";
 import Loading from "../Loading";
 import Widget from "../Dashboard/Widget";
 import Podium from "../Dashboard/Podium";
-import {getSeason, Season} from "../../model/Session";
+import {getSeason, isLastDayOfSeason, Season} from "../../model/Session";
 import SeasonTitle from "../SeasonTitle";
 
 
@@ -16,12 +16,13 @@ const HomePage = () => {
     const [topWinrate, setTopWinrate] = useState<any>([]);
     const [topStarred, setTopStarred] = useState<any>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isFinal, setIsFinal] = useState(isLastDayOfSeason(new Date()));
 
     const currentSeason = getSeason(new Date());
 
     useEffect(() => {
-        console.log(new Date())
-        api.get('/stats/gamesTaken/' + currentSeason)
+        setIsLoading(true);
+        api.get('/stats/gamesTaken/' + currentSeason + (isFinal ? '?event=final' : ''))
             .then(response => {
                 setMostGamesTaken(response.data);
             })
@@ -29,7 +30,7 @@ const HomePage = () => {
                 console.error("Error fetching most games taken:", error);
             });
 
-        api.get('/stats/calledPartners/' + currentSeason)
+        api.get('/stats/calledPartners/' + currentSeason + (isFinal ? '?event=final' : ''))
             .then(response => {
                 setMostGamesCalled(response.data);
             })
@@ -37,19 +38,19 @@ const HomePage = () => {
                 console.error("Error fetching most games called:", error);
             });
 
-        api.get('/stats/mostPointsCumulated/' + currentSeason)
+        api.get('/stats/mostPointsCumulated/' + currentSeason + (isFinal ? '?event=final' : ''))
             .then(response => {
                 setMostPointsCumulated(response.data);
             }).catch(error => {
             console.error("Error fetching most points cumulated:", error);
         })
-        api.get('/stats/topWinrate/' + currentSeason)
+        api.get('/stats/topWinrate/' + currentSeason + (isFinal ? '?event=final' : ''))
             .then(response => {
                 setTopWinrate(response.data);
             }).catch(error => {
             console.error("Error fetching top winrate:", error);
         })
-        api.get('/stats/topStarred/')
+        api.get('/stats/topStarred/' + (isFinal ? '?event=final' : ''))
             .then(response => {
                 setTopStarred(response.data);
             })
@@ -57,14 +58,31 @@ const HomePage = () => {
                 console.error("Error fetching top starred:", error);
             });
         setIsLoading(false);
-    }, [currentSeason]);
+    }, [currentSeason, isFinal]);
 
     return (
         <MobileLayout>
             {
                 isLoading ? <Loading/> :
                     <div className="container mt-4">
-                        <SeasonTitle season={currentSeason as Season}/>
+                        <div className="d-flex justify-content-center">
+                            {
+                                isFinal ? <button type={"button"}
+                                                  className={"btn text-white mb-3"}
+                                                  style={{backgroundColor: 'var(--Bleu, #054A81)'}}
+                                                  onClick={() => {
+                                                      setIsFinal(false);
+                                                  }}>
+                                        Finale
+                                    </button>
+                                    :
+                                    <div onClick={() => {
+                                        setIsFinal(true);
+                                    }}>
+                                        <SeasonTitle season={currentSeason as Season}/>
+                                    </div>
+                            }
+                        </div>
                         <div className="row">
                             {
                                 mostPointsCumulated.length > 2 ?

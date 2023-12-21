@@ -1,6 +1,18 @@
 import {Player} from "./Player";
 import {Game} from "./Game";
 
+const autumn2023 = [new Date(2023, 8, 23), new Date(2023, 11, 21, 23, 59, 59)];
+const winter2023 = [new Date(2024, 11, 22), new Date(2024, 2, 19, 23, 59, 59)];
+const spring2024 = [new Date(2024, 2, 20), new Date(2024, 5, 19, 23, 59, 59)];
+const summer2024 = [new Date(2024, 5, 20), new Date(2024, 8, 21, 23, 59, 59)];
+
+const seasons = [
+    autumn2023,
+    winter2023,
+    spring2024,
+    summer2024,
+];
+
 export interface Session {
     _id: string;
     players: {
@@ -40,10 +52,6 @@ export const getSeasonLabel = (season: any) => {
 }
 
 export const getSeason = (date: Date) => {
-    const autumn2023 = [new Date(2023, 8, 23), new Date(2023, 11, 21, 23, 59, 59)];
-    const winter2023 = [new Date(2024, 11, 22), new Date(2024, 2, 19, 23, 59, 59)];
-    const spring2024 = [new Date(2024, 2, 20), new Date(2024, 5, 19, 23, 59, 59)];
-    const summer2024 = [new Date(2024, 5, 20), new Date(2024, 8, 21, 23, 59, 59)];
 
     if (date >= autumn2023[0] && date <= autumn2023[1]) {
         return 'autumn2023';
@@ -56,4 +64,19 @@ export const getSeason = (date: Date) => {
     } else {
         return '';
     }
+}
+
+export const isLastDayOfSeason = (date: Date) => {
+    let isLastDayOfSeason = false;
+
+    seasons.forEach((season) => {
+        if (date >= season[0] && date <= season[1]) {
+            if (date.getHours() >= 14 && (date.getHours() <= 23 && date.getMinutes() <= 59 && date.getSeconds() <= 59)) {
+                isLastDayOfSeason = true;
+            }
+        }
+    });
+
+    return isLastDayOfSeason;
+
 }
