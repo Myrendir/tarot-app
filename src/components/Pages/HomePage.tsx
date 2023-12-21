@@ -69,7 +69,10 @@ const HomePage = () => {
                             {
                                 isFinal ? <button type={"button"}
                                                   className={"btn text-white mb-3"}
-                                                  style={{backgroundColor: 'var(--Bleu, #054A81)', borderRadius: '15px'}}
+                                                  style={{
+                                                      backgroundColor: 'var(--Bleu, #054A81)',
+                                                      borderRadius: '15px'
+                                                  }}
                                                   onClick={() => {
                                                       setIsFinal(false);
                                                   }}>
@@ -82,7 +85,9 @@ const HomePage = () => {
                                     </button>
                                     :
                                     <div onClick={() => {
-                                        setIsFinal(true);
+                                        if (isLastDayOfSeason(new Date())) {
+                                            setIsFinal(true);
+                                        }
                                     }}>
                                         <SeasonTitle season={currentSeason as Season}/>
                                     </div>
