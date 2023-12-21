@@ -40,10 +40,10 @@ export const getSeasonLabel = (season: any) => {
 }
 
 export const getSeason = (date: Date) => {
-    const autumn2023 = [new Date(2023, 8, 23), new Date(2023, 11, 21)];
-    const winter2023 = [new Date(2024, 11, 22), new Date(2024, 2, 19)];
-    const spring2024 = [new Date(2024, 2, 20), new Date(2024, 5, 19)];
-    const summer2024 = [new Date(2024, 5, 20), new Date(2024, 8, 21)];
+    const autumn2023 = [new Date(2023, 8, 23), new Date(2023, 11, 21, 23, 59, 59)];
+    const winter2023 = [new Date(2024, 11, 22), new Date(2024, 2, 19, 23, 59, 59)];
+    const spring2024 = [new Date(2024, 2, 20), new Date(2024, 5, 19, 23, 59, 59)];
+    const summer2024 = [new Date(2024, 5, 20), new Date(2024, 8, 21, 23, 59, 59)];
 
     if (date >= autumn2023[0] && date <= autumn2023[1]) {
         return 'autumn2023';
