@@ -70,7 +70,7 @@ export const isLastDayOfSeason = (date: Date) => {
     let isLastDayOfSeason = false;
 
     seasons.forEach((season) => {
-        if (date >= season[0] && date <= season[1]) {
+        if (date === season[1]) {
             if (date.getHours() >= 18 && (date.getHours() <= 23 && date.getMinutes() <= 59 && date.getSeconds() <= 59)) {
                 isLastDayOfSeason = true;
             }

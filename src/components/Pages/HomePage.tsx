@@ -60,6 +60,7 @@ const HomePage = () => {
         setIsLoading(false);
     }, [currentSeason, isFinal]);
 
+
     return (
         <MobileLayout>
             {
