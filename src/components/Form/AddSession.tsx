@@ -29,6 +29,7 @@ const AddSession: React.FC = () => {
     const [hasExistingSession, setHasExistingSession] = useState<boolean>(false);
     const [sessions, setSessions] = useState<Session[]>([]);
 
+    const [sessionFound, setSessionFound] = useState<string>('');
     const fetchPlayers = async () => {
         try {
             dispatch(startLoadingPlayers());
@@ -64,8 +65,10 @@ const AddSession: React.FC = () => {
 
                     if (response.status === 200 && response.data.sessionId) {
                         setHasExistingSession(true);
+                        setSessionFound(response.data.sessionId);
                     } else {
                         setHasExistingSession(false);
+                        setSessionFound('')
                     }
                 } else {
                     setHasExistingSession(false);
@@ -185,7 +188,7 @@ const AddSession: React.FC = () => {
                         {
                             hasExistingSession ? <div>
                                     <Link className="btn btn-warning rounded-pill text-white"
-                                          to={`/session/${formData.players.map((p: any) => p._id).join(',')}`}>Utiliser la
+                                          to={`/session/${sessionFound}`}>Utiliser la
                                         session existante</Link>
                                 </div> :
                                 <button type="submit"
