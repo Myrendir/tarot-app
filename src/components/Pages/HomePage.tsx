@@ -49,6 +49,7 @@ const HomePage = () => {
             setIsFinal(true);
             period = statsPeriod.replace('-final', '');
         }
+
         api.get('/stats/gamesTaken/' + period + (isFinal ? '?event=final' : ''))
             .then(response => {
                 setMostGamesTaken(response.data);
@@ -77,7 +78,7 @@ const HomePage = () => {
             }).catch(error => {
             console.error("Error fetching top winrate:", error);
         })
-        api.get('/stats/topStarred/' + (isFinal ? '?event=final' : ''))
+        api.get('/stats/topStarred/' + period + (isFinal ? '?event=final' : ''))
             .then(response => {
                 setTopStarred(response.data);
             })
