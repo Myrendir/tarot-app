@@ -80,3 +80,14 @@ export const isLastDayOfSeason = (date: Date) => {
     return isLastDayOfSeason;
 
 }
+
+export const getEntriesBefore = (seasonEnum: any, limit: string) => {
+    const entries: string[] = [];
+    for (const key in seasonEnum) {
+        if (seasonEnum[key] === limit) {
+            break;
+        }
+        entries.push(seasonEnum[key]);
+    }
+    return entries;
+}

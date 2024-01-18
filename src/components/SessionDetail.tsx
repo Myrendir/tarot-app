@@ -264,22 +264,12 @@ const SessionDetail: React.FC = () => {
 
         return stars;
     }
-    const getSeasonIcon = (season: any) => {
-        if (season?.startsWith('autumn')) {
-            return <PumpkinIco/>
-        } else if (season?.startsWith('spring')) {
-            return <FlowerIco/>
-        } else if (season?.startsWith('winter')) {
-            return <SnowIco/>
-        } else if (season?.startsWith('summer')) {
-            return <SunIco/>
-        }
-    }
+
     return (
         <MobileLayout>
             {isLoading && <Loading/>}
             <div className="container mt-4">
-                <SeasonTitle season={session?.season as Season}/>
+                <SeasonTitle season={session?.season as Season} isFinal={false}/>
                 <table className="table table-bordered mb-4" onClick={() => setModalOpen(true)}>
                     <thead>
                     <tr>
@@ -375,8 +365,6 @@ const SessionDetail: React.FC = () => {
 
 
                 </Modal>
-
-
                 <Modal isOpen={showAddStarModal} onRequestClose={handleAddStar}
                        style={{
                            overlay: {

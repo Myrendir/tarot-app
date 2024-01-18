@@ -5,11 +5,14 @@ import api from "../../services/api";
 import Loading from "../Loading";
 import Widget from "../Dashboard/Widget";
 import Podium from "../Dashboard/Podium";
-import {getSeason, isLastDayOfSeason, Season} from "../../model/Session";
+import {getEntriesBefore, getSeason, isLastDayOfSeason, Season} from "../../model/Session";
 import SeasonTitle from "../SeasonTitle";
-import {FaMedal} from "react-icons/fa";
+
+import Select from "react-select";
 
 const HomePage = () => {
+    const currentSeason = getSeason(new Date());
+    const pastSeasons = getEntriesBefore(Season, currentSeason);
     const [mostGamesTaken, setMostGamesTaken] = useState<any>([]);
     const [mostGamesCalled, setMostGamesCalled] = useState<any>([]);
     const [mostPointsCumulated, setMostPointsCumulated] = useState<any>([]);
@@ -18,11 +21,35 @@ const HomePage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isFinal, setIsFinal] = useState(isLastDayOfSeason(new Date()));
 
-    const currentSeason = getSeason(new Date());
+    const [statsPeriod, setStatsPeriod] = useState(currentSeason);
+
+
+    const periodOptions = [
+        {value: currentSeason, label: <SeasonTitle season={currentSeason as Season} isFinal={false}/>},
+    ];
+
+    pastSeasons.forEach(season => {
+        periodOptions.push({value: season, label: <SeasonTitle season={season as Season} isFinal={false}/>});
+    });
+
+    pastSeasons.forEach(season => {
+        periodOptions.push({
+            value: season + '-final', label: <SeasonTitle season={season as Season}
+                                                          isFinal={true}/>
+        });
+    });
+
+    periodOptions.push({value: 'none', label: <SeasonTitle season={null} isFinal={false}/>});
 
     useEffect(() => {
         setIsLoading(true);
-        api.get('/stats/gamesTaken/' + currentSeason + (isFinal ? '?event=final' : ''))
+
+        let period = statsPeriod;
+        if (statsPeriod.endsWith('-final')) {
+            setIsFinal(true);
+            period = statsPeriod.replace('-final', '');
+        }
+        api.get('/stats/gamesTaken/' + period + (isFinal ? '?event=final' : ''))
             .then(response => {
                 setMostGamesTaken(response.data);
             })
@@ -30,7 +57,7 @@ const HomePage = () => {
                 console.error("Error fetching most games taken:", error);
             });
 
-        api.get('/stats/calledPartners/' + currentSeason + (isFinal ? '?event=final' : ''))
+        api.get('/stats/calledPartners/' + period + (isFinal ? '?event=final' : ''))
             .then(response => {
                 setMostGamesCalled(response.data);
             })
@@ -38,13 +65,13 @@ const HomePage = () => {
                 console.error("Error fetching most games called:", error);
             });
 
-        api.get('/stats/mostPointsCumulated/' + currentSeason + (isFinal ? '?event=final' : ''))
+        api.get('/stats/mostPointsCumulated/' + period + (isFinal ? '?event=final' : ''))
             .then(response => {
                 setMostPointsCumulated(response.data);
             }).catch(error => {
             console.error("Error fetching most points cumulated:", error);
         })
-        api.get('/stats/topWinrate/' + currentSeason + (isFinal ? '?event=final' : ''))
+        api.get('/stats/topWinrate/' + period + (isFinal ? '?event=final' : ''))
             .then(response => {
                 setTopWinrate(response.data);
             }).catch(error => {
@@ -58,41 +85,42 @@ const HomePage = () => {
                 console.error("Error fetching top starred:", error);
             });
         setIsLoading(false);
-    }, [currentSeason, isFinal]);
+    }, [statsPeriod]);
 
+    useEffect(() => {
 
+    }, []);
+
+    const selectStyles = {
+        control: (provided: any) => ({
+            ...provided,
+            border: 'none',
+            boxShadow: 'none',
+            backgroundColor: 'transparent',
+            cursor: 'pointer',
+        }),
+        indicatorSeparator: () => ({
+            display: 'none',
+        }),
+        dropdownIndicator: (provided: any) => ({
+            ...provided,
+            color: 'var(--Bleu, #054A81)',
+        }),
+    };
     return (
         <MobileLayout>
             {
                 isLoading ? <Loading/> :
                     <div className="container mt-4">
                         <div className="d-flex justify-content-center">
-                            {
-                                isFinal ? <button type={"button"}
-                                                  className={"btn text-white mb-3"}
-                                                  style={{
-                                                      backgroundColor: 'var(--Bleu, #054A81)',
-                                                      borderRadius: '15px'
-                                                  }}
-                                                  onClick={() => {
-                                                      setIsFinal(false);
-                                                  }}>
-                                        <FaMedal className={'mr-1'}/>
-
-                                        <span className={'mr-1'}>
-                                        Finale
-                                    </span>
-                                        <FaMedal/>
-                                    </button>
-                                    :
-                                    <div onClick={() => {
-                                        if (isLastDayOfSeason(new Date())) {
-                                            setIsFinal(true);
-                                        }
-                                    }}>
-                                        <SeasonTitle season={currentSeason as Season}/>
-                                    </div>
-                            }
+                            <Select options={periodOptions}
+                                    placeholder={periodOptions[0].label} isSearchable={false}
+                                    className={"mb-1 w-100 align-content-center"} styles={selectStyles}
+                                    onChange={(option: any) => {
+                                        setStatsPeriod(option.value);
+                                        setIsFinal(option.value.includes('final'));
+                                    }}
+                            />
                         </div>
                         <div className="row">
                             {
@@ -103,7 +131,6 @@ const HomePage = () => {
                                                               color={'var(--Bleu, #054A81)'}/>}
                                             title={'Top points cumulés'} color={'var(--Bleu, #054A81)'}/> : null
                             }
-
                             {
                                 topStarred.length > 2 ?
                                     <Widget children={<Podium players={topStarred}
