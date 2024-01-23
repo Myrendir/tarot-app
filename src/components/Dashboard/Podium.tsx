@@ -20,26 +20,11 @@ const Podium = ({players, dataKey, percentage, title, color}: PodiumProps) => {
 
     const [showModal, setShowModal] = useState(false);
 
+    console.log('players', players);
     const handleShowModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
 
     const topThree = players.slice(0, 3);
-
-    /*   const getEqualScoreIndices = (players: PlayerPodium[], key: string): number[] => {
-           const scores = players.map(player => player[key]);
-           const scoreOccurrences: { [key: number]: number[] } = {};
-
-           scores.forEach((score, index) => {
-               if (!scoreOccurrences[score]) {
-                   scoreOccurrences[score] = [];
-               }
-               scoreOccurrences[score].push(index);
-           });
-
-           return Object.values(scoreOccurrences)
-               .filter(indices => indices.length > 1)
-               .flat();
-       }*/
 
     const renderMedalSvg = (step: number) => {
         if (step === 1) {
@@ -99,7 +84,8 @@ const Podium = ({players, dataKey, percentage, title, color}: PodiumProps) => {
                                 textAlign: 'center'
 
                             }}>{percentage ? `${player[dataKey].toFixed(2)}% ` : (Math.round(player[dataKey]))}
-                                {(player.totalGames ? ` (${player.totalGames})` : null)}</h3>
+                                {(player.totalGames ? ` (${player.totalGames})` : null)}
+                                {player['gameCount'] ? ' (' + player['gameCount'] + ')' : null}</h3>
                         </div>
                     ))
                 }
@@ -149,7 +135,7 @@ const Podium = ({players, dataKey, percentage, title, color}: PodiumProps) => {
                                     style={{
                                         color: color,
                                         fontWeight: 'bold'
-                                    }}>{(percentage || dataKey === 'averagePoints') ? player[dataKey].toFixed(2) : player[dataKey]}</td>
+                                    }}>{(percentage || dataKey === 'averagePoints') ? player[dataKey].toFixed(2) : player[dataKey]} {player['gameCount'] ? ' (' + player['gameCount'] + ')' : null}</td>
                             </tr>
                         ))}
                         </tbody>
