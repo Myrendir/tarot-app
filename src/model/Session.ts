@@ -2,8 +2,8 @@ import {Player} from "./Player";
 import {Game} from "./Game";
 
 const autumn2023 = [new Date(2023, 8, 23), new Date(2023, 11, 21, 23, 59, 59)];
-const winter2023 = [new Date(2023, 11, 22), new Date(2024, 2, 21, 0, 5, 0)];
-const spring2024 = [new Date(2024, 2, 21, 0, 5, 1), new Date(2024, 5, 19, 23, 59, 59)];
+const winter2023 = [new Date(2023, 11, 22), new Date(2024, 2, 22, 0, 5, 0)];
+const spring2024 = [new Date(2024, 2, 22, 0, 5, 1), new Date(2024, 5, 19, 23, 59, 59)];
 const summer2024 = [new Date(2024, 5, 20), new Date(2024, 8, 21, 23, 59, 59)];
 
 const seasons = [
