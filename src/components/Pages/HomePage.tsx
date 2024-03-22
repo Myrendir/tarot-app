@@ -54,7 +54,7 @@ const HomePage = () => {
 
         api.get('/stats/gamesTaken/' + period + (isFinal ? '?event=final' : ''))
             .then(response => {
-                setMostGamesTaken(removePlayersWithGameCountLessThanOne(response.data));
+                setMostGamesTaken(response.data);
             })
             .catch(error => {
                 console.error("Error fetching most games taken:", error);
@@ -70,7 +70,7 @@ const HomePage = () => {
 
         api.get('/stats/mostPointsCumulated/' + period + (isFinal ? '?event=final' : ''))
             .then(response => {
-                setMostPointsCumulated(response.data);
+                setMostPointsCumulated(removePlayersWithGameCountLessThanOne(response.data));
             }).catch(error => {
             console.error("Error fetching most points cumulated:", error);
         })
