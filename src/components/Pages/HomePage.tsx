@@ -40,7 +40,9 @@ const HomePage = () => {
     });
 
     periodOptions.push({value: 'none', label: <SeasonTitle season={null} isFinal={false}/>});
-
+    const removePlayersWithGameCountLessThanOne = (players: any) => {
+        return players.filter((player: any) => player.gameCount >= 1);
+    }
     useEffect(() => {
         setIsLoading(true);
 
@@ -52,7 +54,7 @@ const HomePage = () => {
 
         api.get('/stats/gamesTaken/' + period + (isFinal ? '?event=final' : ''))
             .then(response => {
-                setMostGamesTaken(response.data);
+                setMostGamesTaken(removePlayersWithGameCountLessThanOne(response.data));
             })
             .catch(error => {
                 console.error("Error fetching most games taken:", error);

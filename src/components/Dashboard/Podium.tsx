@@ -20,7 +20,6 @@ const Podium = ({players, dataKey, percentage, title, color}: PodiumProps) => {
 
     const [showModal, setShowModal] = useState(false);
 
-    console.log('players', players);
     const handleShowModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
 
