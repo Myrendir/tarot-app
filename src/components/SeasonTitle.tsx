@@ -1,9 +1,9 @@
 import {getSeasonLabel, Season} from "../model/Session";
-import PumpkinIco from "./Icons/seasons/PumpkinIco";
 import FlowerIco from "./Icons/seasons/FlowerIco";
 import SunIco from "./Icons/seasons/SunIco";
 import React from "react";
 import {FaGlobe, FaLeaf, FaSnowflake} from "react-icons/fa";
+import {LuFlower} from "react-icons/lu";
 
 const SeasonTitle = ({season, isFinal}: { season: Season | null, isFinal: boolean }) => {
     const getSeasonIcon = (season: any) => {
@@ -14,7 +14,9 @@ const SeasonTitle = ({season, isFinal}: { season: Season | null, isFinal: boolea
         if (season?.startsWith('autumn')) {
             return <FaLeaf color="#C78657"/>
         } else if (season?.startsWith('spring')) {
-            return <FlowerIco/>
+            return <LuFlower
+                color={'#ff69b4'}
+            />
         } else if (season?.startsWith('winter')) {
             return <FaSnowflake color={'#a0e6ec'}/>
         } else if (season?.startsWith('summer')) {
