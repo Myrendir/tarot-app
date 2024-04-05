@@ -1,28 +1,36 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import api from '../services/api';
 import {getSeason, getSeasonLabel, Season, Session, SessionPlayer} from '../model/Session';
 import {BET, PETIT_AU_BOUT, TIPS, MAX_SCORE} from '../model/Game';
 import Modal from 'react-modal';
-import {Modal as BootstrapModal, Button} from "react-bootstrap";
+import {Modal as BootstrapModal, Button, ModalFooter, ModalBody} from "react-bootstrap";
 import MobileLayout from "../Layout/MobileLayout";
 import SaveButton from "./Button/SaveButton";
 import {toastr} from "react-redux-toastr";
 import ResetButton from "./Button/ResetButton";
 import Loading from "./Loading";
 import {FaCrown, FaStar} from 'react-icons/fa'
-import {BsFillArrowLeftCircleFill} from 'react-icons/bs'
 import {Player} from "../model/Player";
-import PumpkinIco from "./Icons/seasons/PumpkinIco";
-import FlowerIco from "./Icons/seasons/FlowerIco";
-import SnowIco from "./Icons/seasons/SnowIco";
-import SunIco from "./Icons/seasons/SunIco";
 import SeasonTitle from "./SeasonTitle";
+import {MdChangeCircle} from "react-icons/md";
+import {log} from "node:util";
+import AddSession from "./Form/AddSession";
+import SelectPlayerComponent from "./Form/SelectPlayerComponent";
+import {playerError, playersReceived, startLoadingPlayers} from "../store/playerSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../store";
 
 const SessionDetail: React.FC = () => {
+    const dispatch = useDispatch();
+
     const {id} = useParams<{ id: string }>();
 
     const [session, setSession] = useState<Session | null>(null);
+    useEffect(() => {
+        fetchSession();
+        // eslint-disable-next-line
+    }, [id]);
     const [bet, setBet] = useState('');
     const [taker, setTaker] = useState('');
     const [partner, setPartner] = useState('');
@@ -39,7 +47,47 @@ const SessionDetail: React.FC = () => {
     const [showAddStarModal, setShowAddStarModal] = useState(false);
     const [guilty, setGuilty] = useState('');
     const [guiltyType, setGuiltyType] = useState('');
+    const [isChangePlayerOpen, setChangePlayerOpen] = useState(false);
+    const [formData, setFormData] = useState({
+        players: Array(5).fill(session?.players),
+    });
 
+    const fetchPlayers = async () => {
+        try {
+            dispatch(startLoadingPlayers());
+
+            const response = await api.get('/player/');
+
+            if (response.status !== 200) {
+                throw new Error(response.data.message);
+            }
+
+            dispatch(playersReceived(response.data));
+        } catch (error: any) {
+            dispatch(playerError(error.message));
+        }
+    };
+    const players = useSelector((state: RootState) => state.player.players);
+
+    useEffect(() => {
+        fetchPlayers();
+        // eslint-disable-next-line
+    }, [dispatch]);
+
+    /* const selectOptions = useMemo(() => {
+         return players.map(player => ({
+             value: player._id,
+             label: `${player.firstname} ${player.lastname.charAt(0)}.`,
+         }));
+     }, [players])*/
+
+
+    const selectOptions = useMemo(() => {
+        return players.map(player => ({
+            value: player._id,
+            label: `${player.firstname} ${player.lastname.charAt(0)}.`,
+        }));
+    }, [players]);
     const slideAmount = 200;
 
     const handleAddStar = () => {
@@ -56,7 +104,6 @@ const SessionDetail: React.FC = () => {
             toastr.error('Erreur', 'Il faut sélectionner un type d\'erreur.', {timeOut: 3000});
             return;
         }
-
 
         api
             .post(`/session/addStar/${id}/${guilty}`, {
@@ -116,16 +163,15 @@ const SessionDetail: React.FC = () => {
             };
 
             setSession(completeSessionData);
+            setFormData({
+                players: completeSessionData.players.map((p: SessionPlayer) => p.player)
+            });
             setIsLoading(false);
         } catch (error) {
             console.error("Erreur lors de la récupération de la session:", error);
         }
     };
 
-    useEffect(() => {
-        fetchSession();
-        // eslint-disable-next-line
-    }, [id]);
 
     const handleReset = () => {
         setBet('');
@@ -264,11 +310,132 @@ const SessionDetail: React.FC = () => {
 
         return stars;
     }
+    const isNewPlayerComposition = (players: any): boolean => {
+        if (players.includes(undefined)) {
+            return false;
+        }
+
+        return players.map((p: any) => p._id).join(',') !== session?.players.map((p: any) => p.player._id).join(',');
+    }
+
+    const renderChangePlayer = () => {
+        return (
+            <div>
+                <div className="p-1">
+                    <p className="text-warning" style={{fontSize: '0.8rem'}}
+                       onClick={() => setChangePlayerOpen(true)}>
+                        <MdChangeCircle size={20}/>
+                        changer un ou plusieurs joueurs</p>
+                </div>
+                <Modal isOpen={isChangePlayerOpen} onRequestClose={() => setChangePlayerOpen(false)}
+                       style={{
+                           overlay: {
+                               backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                               zIndex: 9999
+                           },
+                           content: {height: 'calc(60%)'}
+                       }}>
+                    <h6 style={{
+                        color: 'var(--Bleu, #054A81)',
+                        fontWeight: 'bold'
+                    }} className={'pb-1 text-center'}>Changer un ou plusieurs joueurs</h6>
+                    <ModalBody>
+                        <div className="row">
+                            <div className="col-12">
+                                {session?.players.map((player: any, index: number) => (
+                                    <div key={player.player._id} className="d-flex justify-content-between">
+                                        <div>
+                                            <SelectPlayerComponent
+                                                key={index}
+                                                index={index}
+                                                selectedPlayer={player}
+                                                formData={formData}
+                                                setFormData={setFormData}
+                                                selectOptions={selectOptions}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+
+                            </div>
+                        </div>
+                    </ModalBody>
+                    <div className={'text-center'}>
+                        {
+                            isNewPlayerComposition(formData?.players) && (
+                                <Button className={'col-8'} style={{
+                                    backgroundColor: 'var(--Bleu, #054A81)',
+                                    borderColor: 'var(--Bleu, #054A81)',
+                                    color: 'white',
+                                    borderRadius: '20px',
+                                }} onClick={() => {
+                                    // check if a session exist with the given ply
+
+                                }}>
+                                    <span style={{fontSize: '1.2rem'}}>changer</span>
+                                </Button>
+
+                            )
+                        }
+                    </div>
+                </Modal>
+            </div>
+        );
+    }
 
     return (
         <MobileLayout>
-            {isLoading && <Loading/>}
-            <div className="container mt-4">
+            <div>
+                {isLoading && <Loading/>}
+                <div className={'text-black'}>
+                    <SeasonTitle season={session?.season as Season} isFinal={false}/>
+                </div>
+                <h5 style={{
+                    color: 'var(--Bleu, #054A81)',
+                }} className={'p-2'}>
+                    {`${session?.games.length} partie${(session?.games && (session?.games.length > 1)) ? 's' : ''} jouée${(session?.games && (session?.games.length > 1)) ? 's' : ''}`}
+                </h5>
+                {renderChangePlayer()}
+
+                <div className="p-1">
+                    <table className="card p-1" style={{
+                        borderRadius: '10px',
+                    }}>
+                        <thead>
+                        <tr className="d-flex" style={{
+                            justifyContent: 'space-between',
+                        }}>
+                            <th>Nom des joueurs</th>
+                            <th>Score</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {session?.players.map((player) => (
+                            <tr className={'d-flex'} style={{
+                                justifyContent: 'space-between',
+                            }} key={player.player._id}>
+                                <td className={'d-flex'}
+                                    style={{justifyContent: 'space-between', color: 'var(--Bleu, #054A81)'}}>
+                                    <div>
+                                        {player.player.firstname + ' ' + player.player.lastname.charAt(0).toUpperCase() + '. '}
+                                    </div>
+                                </td>
+                                <td style={{
+                                    color: 'var(--Bleu, #054A81)',
+                                    fontWeight: 'bold'
+                                }}>
+                                    {player.score}
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+
+                </div>
+
+                {/*<div className="container mt-4">
                 <SeasonTitle season={session?.season as Season} isFinal={false}/>
                 <table className="table table-bordered mb-4" onClick={() => setModalOpen(true)}>
                     <thead>
@@ -412,7 +579,7 @@ const SessionDetail: React.FC = () => {
                         </div>
                     </div>
                 </Modal>
-                {/* Form */}
+                 Form
                 <div className="row">
                     <div className="col-md-12">
                         <div>
@@ -541,6 +708,7 @@ const SessionDetail: React.FC = () => {
                     </div>
 
                 </div>
+            </div>*/}
             </div>
         </MobileLayout>
     );

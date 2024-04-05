@@ -19,11 +19,13 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({children}) => {
     const location = useLocation();
     return (
         <div className="d-flex flex-column vh-100  mb-5">
-            <div className="flex-grow-1 overflow-auto mb-5">
+            <div className="flex-grow-1 overflow-auto mb-5 bg-light">
                 {children}
             </div>
             <div className={"mb-2"}></div>
-            <div className="navbar navbar-expand-lg navbar-light bg-light border-top fixed-bottom mt-5">
+            <div className="navbar navbar-expand-lg navbar-light bg-white border-top fixed-bottom mt-5" style={{
+                borderRadius: '20px',
+            }}>
                 <div className="d-flex justify-content-around w-100">
                     <Link className="nav-link mt-2"
                           style={{color: 'var(--Bleu, #054A81)'}}

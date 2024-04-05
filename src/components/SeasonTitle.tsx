@@ -30,13 +30,13 @@ const SeasonTitle = ({season, isFinal}: { season: Season | null, isFinal: boolea
     }
     return (
         <div>
-            <h6 className="d-flex justify-content-center align-items-center">
+            <h5 className="d-flex justify-content-center align-items-center">
                 <div>{getSeasonIcon(season)}</div>
                 <div style={{
                     marginBottom: '-0.2rem',
                 }}>&nbsp;{getSeasonTitleLabel(season)}&nbsp;</div>
                 <div>{getSeasonIcon(season)}</div>
-            </h6>
+            </h5>
         </div>
     )
 
