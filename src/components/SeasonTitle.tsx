@@ -5,21 +5,26 @@ import {FaGlobe, FaLeaf, FaSnowflake} from "react-icons/fa";
 import {LuFlower} from "react-icons/lu";
 
 const SeasonTitle = ({season, isFinal}: { season: Season | null, isFinal: boolean }) => {
-    const getSeasonIcon = (season: any) => {
+    const getSeasonIcon = (season: string | null) => {
+        const iconMapping: { [key: string]: JSX.Element } = {
+            autumn: <FaLeaf color="#C78657" />,
+            spring: <LuFlower color="#ff69b4" />,
+            winter: <FaSnowflake color="#a0e6ec" />,
+            summer: <SunIco />,
+        };
+
         if (season === null) {
-            return <FaGlobe color='var(--Bleu, #054A81)'/>
+            return <FaGlobe color='var(--Bleu, #054A81)' />;
         }
 
-        if (season?.startsWith('autumn')) {
-            return <FaLeaf color="#C78657"/>
-        } else if (season?.startsWith('spring')) {
-            return <LuFlower color={'#ff69b4'}/>
-        } else if (season?.startsWith('winter')) {
-            return <FaSnowflake color={'#a0e6ec'}/>
-        } else if (season?.startsWith('summer')) {
-            return <SunIco/>
+        for (const key in iconMapping) {
+            if (season?.startsWith(key)) {
+                return iconMapping[key];
+            }
         }
-    }
+
+        return <FaGlobe color='var(--Bleu, #054A81)' />;
+    };
 
     const getSeasonTitleLabel = (season: Season | null) => {
         if (season === null) {
