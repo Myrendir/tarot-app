@@ -41,13 +41,13 @@ export enum Season {
 export const getSeasonLabel = (season: any) => {
     switch (season) {
         case Season.AUTUMN2023:
-            return 'Automne 2023';
+            return 'automne 2023';
         case Season.WINTER2023:
-            return 'Hiver 2023/2024';
+            return 'hiver 2023/2024';
         case Season.SPRING2024:
-            return 'Printemps 2024';
+            return 'printemps 2024';
         case Season.SUMMER2024:
-            return 'Été 2024';
+            return 'été 2024';
     }
 }
 
