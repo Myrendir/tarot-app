@@ -52,6 +52,8 @@ const SessionDetail: React.FC = () => {
         players: Array(5).fill(session?.players),
     });
 
+    console.log('formData', formData)
+
     const fetchPlayers = async () => {
         try {
             dispatch(startLoadingPlayers());
@@ -62,6 +64,7 @@ const SessionDetail: React.FC = () => {
                 throw new Error(response.data.message);
             }
 
+            console.log('players', response.data)
             dispatch(playersReceived(response.data));
         } catch (error: any) {
             dispatch(playerError(error.message));
@@ -343,17 +346,15 @@ const SessionDetail: React.FC = () => {
                         <div className="row">
                             <div className="col-12">
                                 {session?.players.map((player: any, index: number) => (
-                                    <div key={player.player._id} className="d-flex justify-content-between">
-                                        <div>
-                                            <SelectPlayerComponent
-                                                key={index}
-                                                index={index}
-                                                selectedPlayer={player}
-                                                formData={formData}
-                                                setFormData={setFormData}
-                                                selectOptions={selectOptions}
-                                            />
-                                        </div>
+                                    <div key={player.player._id} className="d-flex">
+                                        <SelectPlayerComponent
+                                            key={index}
+                                            index={index}
+                                            selectedPlayer={player}
+                                            formData={formData}
+                                            setFormData={setFormData}
+                                            selectOptions={selectOptions}
+                                        />
                                     </div>
                                 ))}
 
@@ -369,7 +370,27 @@ const SessionDetail: React.FC = () => {
                                     color: 'white',
                                     borderRadius: '20px',
                                 }} onClick={() => {
-                                    // check if a session exist with the given ply
+
+                                    const checkExistingSession = async () => {
+                                        try {
+                                            const selectedPlayers = formData.players.filter(p => p !== null);
+                                            console.log(selectedPlayers);
+                                            if (selectedPlayers.length !== 5) {
+                                                return toastr.warning('Erreur', 'Il faut 5 joueurs pour charger une session.', {timeOut: 3000});
+                                            }
+                                            const response = await api.get('/session/check', {
+                                                params: {
+                                                    players: selectedPlayers,
+                                                },
+                                            });
+
+
+                                        } catch (error) {
+                                            console.error("Error checking for existing session:", error);
+                                        }
+                                    }
+
+                                    checkExistingSession();
 
                                 }}>
                                     <span style={{fontSize: '1.2rem'}}>changer</span>
