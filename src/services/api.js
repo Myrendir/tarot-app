@@ -13,4 +13,15 @@ const instance = axios.create({
     },
 });
 
+instance.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        if (error && error.response && error.response.status === 404) {
+            return error.response;
+        }
+    }
+);
+
 export default instance;
