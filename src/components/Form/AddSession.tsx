@@ -1,10 +1,6 @@
-import React, {useEffect, useState, useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {
-    sessionAdded,
-    startLoading,
-    sessionError,
-} from '../../store/sessionSlice';
+import {sessionAdded, sessionError, startLoading,} from '../../store/sessionSlice';
 import {RootState} from "../../store";
 import {playerError, playersReceived, startLoadingPlayers} from "../../store/playerSlice";
 import api from "../../services/api";
@@ -155,9 +151,7 @@ const AddSession: React.FC = () => {
         try {
             dispatch(startLoading());
 
-            const response = await api.post('/session', JSON.stringify(formData));
-
-            const data = await response;
+            const data = await api.post('/session', JSON.stringify(formData));
 
             dispatch(sessionAdded(data));
 
