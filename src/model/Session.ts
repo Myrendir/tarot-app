@@ -5,12 +5,14 @@ const autumn2023 = [new Date(2023, 8, 23), new Date(2023, 11, 21, 23, 59, 59)];
 const winter2023 = [new Date(2023, 11, 22), new Date(2024, 2, 22, 0, 5, 0)];
 const spring2024 = [new Date(2024, 2, 22, 0, 5, 1), new Date(2024, 5, 19, 23, 59, 59)];
 const summer2024 = [new Date(2024, 5, 20), new Date(2024, 8, 21, 23, 59, 59)];
+const autumn2024 = [new Date(2024, 8, 22), new Date(2024, 11, 21, 23, 59, 59)];
 
 const seasons = [
     autumn2023,
     winter2023,
     spring2024,
     summer2024,
+    autumn2024,
 ];
 
 export interface Session {
@@ -36,6 +38,7 @@ export enum Season {
     WINTER2023 = 'winter2023',
     SPRING2024 = 'spring2024',
     SUMMER2024 = 'summer2024',
+    AUTUMN2024 = 'autumn2024',
 }
 
 export const getSeasonLabel = (season: any) => {
@@ -48,6 +51,8 @@ export const getSeasonLabel = (season: any) => {
             return 'Printemps 2024';
         case Season.SUMMER2024:
             return 'Été 2024';
+        case Season.AUTUMN2024:
+            return 'Automne 2024';
     }
 }
 
@@ -61,6 +66,8 @@ export const getSeason = (date: Date) => {
         return 'spring2024';
     } else if (date >= summer2024[0] && date <= summer2024[1]) {
         return 'summer2024';
+    } else if (date >= autumn2024[0] && date <= autumn2024[1]) {
+        return 'autumn2024';
     } else {
         return '';
     }
