@@ -23,26 +23,29 @@ const HomePage = () => {
 
     const [statsPeriod, setStatsPeriod] = useState(currentSeason);
 
-
     const periodOptions = [
-        {value: currentSeason, label: <SeasonTitle season={currentSeason as Season} isFinal={false}/>},
+        {value: 'none', label: <SeasonTitle season={null} isFinal={false}/>}
     ];
 
+    periodOptions.push({value: currentSeason, label: <SeasonTitle season={currentSeason as Season} isFinal={false}/>});
+
+    pastSeasons.reverse();
     pastSeasons.forEach(season => {
-        periodOptions.push({value: season, label: <SeasonTitle season={season as Season} isFinal={false}/>});
+        periodOptions.push(
+            {
+                value: season, label: <SeasonTitle season={season as Season} isFinal={false}/>
+            },
+            {
+                value: season + '-final', label: <SeasonTitle season={season as Season}
+                                                              isFinal={true}/>
+            }
+        );
     });
 
-    pastSeasons.forEach(season => {
-        periodOptions.push({
-            value: season + '-final', label: <SeasonTitle season={season as Season}
-                                                          isFinal={true}/>
-        });
-    });
-
-    periodOptions.push({value: 'none', label: <SeasonTitle season={null} isFinal={false}/>});
     const removePlayersWithGameCountLessThanOne = (players: any) => {
         return players.filter((player: any) => player.gameCount >= 1);
     }
+
     useEffect(() => {
         setIsLoading(true);
 
@@ -117,6 +120,7 @@ const HomePage = () => {
                     <div className="container mt-4">
                         <div className="d-flex justify-content-center">
                             <Select options={periodOptions}
+                                    defaultValue={periodOptions[1]}
                                     placeholder={periodOptions[0].label} isSearchable={false}
                                     className={"mb-1 w-100 align-content-center"} styles={selectStyles}
                                     onChange={(option: any) => {
