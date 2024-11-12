@@ -394,6 +394,7 @@ const SessionDetail: React.FC = () => {
                                 <option value='distribution'>Distribution</option>
                                 <option value='parle'>Parlante</option>
                                 <option value='jeu'>Faute de jeu</option>
+                                <option value='insulte'>Insulte</option>
                             </select>
 
                             <div className="d-flex justify-content-center mt-2">
