@@ -8,7 +8,7 @@ import {
 import {RootState} from "../../store";
 import {playerError, playersReceived, startLoadingPlayers} from "../../store/playerSlice";
 import api from "../../services/api";
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useNavigate, useLocation} from 'react-router-dom';
 import MobileLayout from "../../Layout/MobileLayout";
 import {toastr} from "react-redux-toastr";
 import {Session, SessionPlayer} from "../../model/Session";
@@ -19,6 +19,7 @@ import {getPlayerFullname} from "../../model/Player";
 const AddSession: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [formData, setFormData] = useState({
         date: '',
@@ -123,6 +124,20 @@ const AddSession: React.FC = () => {
     useEffect(() => {
         getVisitedSessions();
     }, []);
+
+    useEffect(() => {
+        // Check if we have players in the query params
+        const queryParams = new URLSearchParams(location.search);
+        const playersParam = queryParams.get('players');
+        
+        if (playersParam) {
+            const playerIds = playersParam.split(',');
+            setFormData(prev => ({
+                ...prev,
+                players: playerIds
+            }));
+        }
+    }, [location]);
 
     const getSessionResume = (session: Session) => {
         const players = session.players.map((p: SessionPlayer) => getPlayerFullname(p.player)).join(', ');
