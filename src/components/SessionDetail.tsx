@@ -18,6 +18,31 @@ import FlowerIco from "./Icons/seasons/FlowerIco";
 import SnowIco from "./Icons/seasons/SnowIco";
 import SunIco from "./Icons/seasons/SunIco";
 import SeasonTitle from "./SeasonTitle";
+import SelectPlayerComponent from "./Form/SelectPlayerComponent";
+import { Line } from 'react-chartjs-2';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+} from 'chart.js';
+
+// Register ChartJS components
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+);
+
+Modal.setAppElement('#root');
 
 const SessionDetail: React.FC = () => {
     const {id} = useParams<{ id: string }>();
@@ -41,8 +66,7 @@ const SessionDetail: React.FC = () => {
     const [guilty, setGuilty] = useState('');
     const [guiltyType, setGuiltyType] = useState('');
     const [showChangePlayerModal, setShowChangePlayerModal] = useState(false);
-    const [selectedPlayer, setSelectedPlayer] = useState('');
-    const [newPlayer, setNewPlayer] = useState('');
+    const [changePlayerFormData, setChangePlayerFormData] = useState({ players: ['', ''] });
     const [availablePlayers, setAvailablePlayers] = useState<Player[]>([]);
 
     const slideAmount = 200;
@@ -281,22 +305,28 @@ const SessionDetail: React.FC = () => {
         }
     };
 
+    const getPlayerSelectOptions = (players: Player[]) => {
+        return players.map(player => ({
+            value: player._id,
+            label: `${player.firstname} ${player.lastname.charAt(0).toUpperCase()}.`
+        }));
+    };
+
     const handleChangePlayer = async () => {
-        if (!selectedPlayer || !newPlayer) {
+        if (!changePlayerFormData.players[0] || !changePlayerFormData.players[1]) {
             toastr.error('Erreur', 'Veuillez sélectionner les deux joueurs.', {timeOut: 3000});
             return;
         }
 
         try {
             const response = await api.put(`/session/${id}/changePlayer`, {
-                oldPlayerId: selectedPlayer,
-                newPlayerId: newPlayer
+                oldPlayerId: changePlayerFormData.players[0],
+                newPlayerId: changePlayerFormData.players[1]
             });
 
             toastr.success('Succès', 'Le joueur a été remplacé.', {timeOut: 3000});
             setShowChangePlayerModal(false);
-            setSelectedPlayer('');
-            setNewPlayer('');
+            setChangePlayerFormData({ players: ['', ''] });
 
             // Redirect to the new/existing session
             if (response.data.session._id !== id) {
@@ -318,6 +348,63 @@ const SessionDetail: React.FC = () => {
             fetchAvailablePlayers();
         }
     }, [showChangePlayerModal]);
+
+    const getLastFiveGamesScores = () => {
+        if (!session) return null;
+
+        // Get last 5 games
+        const lastGames = session.games.slice(-5);
+        const scores: { [key: string]: number[] } = {};
+
+
+        // Initialize scores for each player with empty arrays
+        session.players.forEach(player => {
+            scores[player.player.username] = [];
+        });
+
+        // Calculate cumulative scores for each game
+        lastGames.forEach((game, gameIndex) => {
+            
+            // For each player, get their current total and add this game's score
+            session.players.forEach(sessionPlayer => {
+                
+                const gamePlayer = game.players.find(
+                    p => p.player._id === sessionPlayer.player._id
+                );
+                
+                
+                if (gamePlayer) {
+                    const previousScore = scores[sessionPlayer.player.username][gameIndex - 1] || 0;  // Use 0 if it's the first game
+                    const newScore = previousScore + gamePlayer.score;
+                    scores[sessionPlayer.player.username][gameIndex] = newScore;
+                }
+            });
+        });
+
+        // Create labels based on the number of games from the end
+        const gameLabels = lastGames.map((_, idx) => {
+            const gamesFromEnd = lastGames.length - idx;
+            return `Partie N-${gamesFromEnd}`;
+        });
+
+        const chartData = {
+            labels: gameLabels,
+            datasets: Object.entries(scores).map(([username, scores], index) => ({
+                label: username,
+                data: scores,
+                borderColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF'
+                ][index % 5],
+                fill: false,
+                tension: 0.1
+            }))
+        };
+        return chartData;
+    };
 
     return (
         <MobileLayout>
@@ -363,35 +450,47 @@ const SessionDetail: React.FC = () => {
 
                 </table>
                 {
-                    isCurrentSeason() ?
-                        (
-                            <div className="d-flex justify-content-between mb-2">
-                                <div>
-                                    <button type="button" className="btn btn-dark btn-sm" style={{
+                    isCurrentSeason() ? (
+                        <div className="d-flex gap-4 mb-2 px-2">
+                            <button 
+                                type="button" 
+                                className="btn btn-dark btn-sm flex-grow-1" 
+                                style={{
+                                    fontSize: '0.7rem',
+                                    margin: '0 4px'
+                                }} 
+                                onClick={() => handleAddStar()}
+                            >
+                                <i className="fa fa-star"/> Ajouter une étoile
+                            </button>
+                            
+                            {session?.games && session?.games.length > 0 ? (
+                                <button 
+                                    type="button" 
+                                    className="btn btn-warning btn-sm flex-grow-1" 
+                                    style={{
                                         fontSize: '0.7rem',
-                                    }} onClick={() => {
-                                        handleAddStar();
-                                    }}><i className="fa fa-star"/> Ajouter une étoile
-                                    </button>
-                                </div>
-                                <div className="d-flex">
-                                    {session?.games && session?.games.length > 0 ?
-                                        (
-                                            <button type="button" className="btn btn-warning btn-sm me-2" style={{
-                                                fontSize: '0.7rem',
-                                            }} onClick={() => {
-                                                setShowDeleteModal(true);
-                                            }}>Annuler la dernière partie
-                                            </button>
-                                        ) : null}
-                                    <button type="button" className="btn btn-primary btn-sm" style={{
-                                        fontSize: '0.7rem',
-                                    }} onClick={() => setShowChangePlayerModal(true)}>
-                                        Changer un joueur <i style={{fontSize: '0.6rem'}}>(By CryptoWeb ❤️)</i>
-                                    </button>
-                                </div>
-                            </div>
-                        ) : null
+                                        margin: '0 4px'
+                                    }} 
+                                    onClick={() => setShowDeleteModal(true)}
+                                >
+                                    Annuler la dernière partie
+                                </button>
+                            ) : null}
+                            
+                            <button 
+                                type="button" 
+                                className="btn btn-primary btn-sm flex-grow-1" 
+                                style={{
+                                    fontSize: '0.7rem',
+                                    margin: '0 4px'
+                                }} 
+                                onClick={() => setShowChangePlayerModal(true)}
+                            >
+                                Changer un joueur
+                            </button>
+                        </div>
+                    ) : null
                 }
 
                 <BootstrapModal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
@@ -400,12 +499,24 @@ const SessionDetail: React.FC = () => {
                     </BootstrapModal.Header>
                     <BootstrapModal.Body>Êtes-vous sûr de vouloir annuler la dernière partie?</BootstrapModal.Body>
                     <BootstrapModal.Footer>
-                        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                            Annuler
-                        </Button>
-                        <Button variant="danger" onClick={() => setDeleteModalOpen()}>
-                            Confirmer
-                        </Button>
+                        <div className="d-flex justify-content-center w-100">
+                            <div className={"m-1"}>
+                                <button 
+                                    className="btn btn-danger rounded-pill" 
+                                    onClick={() => setShowDeleteModal(false)}
+                                >
+                                    Annuler
+                                </button>
+                            </div>
+                            <div className={"m-1"}>
+                                <button 
+                                    className="btn btn-primary rounded-pill" 
+                                    onClick={() => setDeleteModalOpen()}
+                                >
+                                    Confirmer
+                                </button>
+                            </div>
+                        </div>
                     </BootstrapModal.Footer>
                 </BootstrapModal>
                 <Modal
@@ -416,12 +527,39 @@ const SessionDetail: React.FC = () => {
                             backgroundColor: 'rgba(0, 0, 0, 0.75)',
                             zIndex: 9999
                         },
-                        content: {height: 'calc(75% - 100px)'}
+                        content: {
+                            height: '75%',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }
                     }}
                 >
-                    <h4>Tableau des scores</h4>
-
-
+                    <h4>Évolution des scores</h4>
+                    {getLastFiveGamesScores() && (
+                        <div style={{ flex: 1, position: 'relative' }}>
+                            <Line
+                                data={getLastFiveGamesScores()!}
+                                options={{
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'top' as const,
+                                        },
+                                        title: {
+                                            display: false,
+                                            text: 'Historique des 5 dernières parties'
+                                        }
+                                    },
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    }
+                                }}
+                            />
+                        </div>
+                    )}
                 </Modal>
                 <Modal isOpen={showAddStarModal} onRequestClose={handleAddStar}
                        style={{
@@ -486,52 +624,43 @@ const SessionDetail: React.FC = () => {
                     <div className="row">
                         <div className="col-md-12">
                             <h6>Joueur à remplacer</h6>
-                            <select 
-                                className="form-control" 
-                                value={selectedPlayer}
-                                onChange={(e) => setSelectedPlayer(e.target.value)}
-                            >
-                                <option value="">Sélectionner un joueur</option>
-                                {session?.players.map(player => (
-                                    <option 
-                                        key={player.player._id} 
-                                        value={player.player._id}
-                                    >
-                                        {`${player.player.firstname} ${player.player.lastname.charAt(0).toUpperCase()}.`}
-                                    </option>
-                                ))}
-                            </select>
+                            <SelectPlayerComponent
+                                index={0}
+                                selectedPlayer={changePlayerFormData.players[0]}
+                                formData={changePlayerFormData}
+                                setFormData={setChangePlayerFormData}
+                                selectOptions={getPlayerSelectOptions(session?.players.map(p => p.player) || [])}
+                            />
 
                             <h6 className="mt-3">Nouveau joueur</h6>
-                            <select 
-                                className="form-control"
-                                value={newPlayer}
-                                onChange={(e) => setNewPlayer(e.target.value)}
-                            >
-                                <option value="">Sélectionner un joueur</option>
-                                {availablePlayers.map(player => (
-                                    <option 
-                                        key={player._id} 
-                                        value={player._id}
-                                    >
-                                        {`${player.firstname} ${player.lastname.charAt(0).toUpperCase()}.`}
-                                    </option>
-                                ))}
-                            </select>
+                            <SelectPlayerComponent
+                                index={1}
+                                selectedPlayer={changePlayerFormData.players[1]}
+                                formData={changePlayerFormData}
+                                setFormData={setChangePlayerFormData}
+                                selectOptions={getPlayerSelectOptions(availablePlayers)}
+                            />
 
-                            <div className="d-flex justify-content-center mt-4">
-                                <button 
-                                    className="btn btn-danger me-2" 
-                                    onClick={() => setShowChangePlayerModal(false)}
-                                >
-                                    Annuler
-                                </button>
-                                <button 
-                                    className="btn btn-primary" 
-                                    onClick={handleChangePlayer}
-                                >
-                                    Confirmer
-                                </button>
+                            <div className="d-flex justify-content-center mt-2">
+                                <div className={"m-1"}>
+                                    <button 
+                                        className="btn btn-danger rounded-pill" 
+                                        onClick={() => {
+                                            setShowChangePlayerModal(false);
+                                            setChangePlayerFormData({ players: ['', ''] });
+                                        }}
+                                    >
+                                        Annuler
+                                    </button>
+                                </div>
+                                <div className={"m-1"}>
+                                    <button 
+                                        className="btn btn-primary rounded-pill" 
+                                        onClick={handleChangePlayer}
+                                    >
+                                        Confirmer
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
