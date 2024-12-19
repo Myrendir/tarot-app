@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useParams} from 'react-router-dom';
+import {useParams, useNavigate} from 'react-router-dom';
 import api from '../services/api';
 import {getSeason, getSeasonLabel, Season, Session, SessionPlayer} from '../model/Session';
 import {BET, PETIT_AU_BOUT, TIPS, MAX_SCORE} from '../model/Game';
@@ -21,6 +21,7 @@ import SeasonTitle from "./SeasonTitle";
 
 const SessionDetail: React.FC = () => {
     const {id} = useParams<{ id: string }>();
+    const navigate = useNavigate();
 
     const [session, setSession] = useState<Session | null>(null);
     const [bet, setBet] = useState('');
@@ -39,6 +40,10 @@ const SessionDetail: React.FC = () => {
     const [showAddStarModal, setShowAddStarModal] = useState(false);
     const [guilty, setGuilty] = useState('');
     const [guiltyType, setGuiltyType] = useState('');
+    const [showChangePlayerModal, setShowChangePlayerModal] = useState(false);
+    const [selectedPlayer, setSelectedPlayer] = useState('');
+    const [newPlayer, setNewPlayer] = useState('');
+    const [availablePlayers, setAvailablePlayers] = useState<Player[]>([]);
 
     const slideAmount = 200;
 
@@ -265,6 +270,55 @@ const SessionDetail: React.FC = () => {
         return stars;
     }
 
+    const fetchAvailablePlayers = async () => {
+        try {
+            const response = await api.get('/player');
+            const currentPlayerIds = session?.players.map(p => p.player._id) || [];
+            const availablePlayers = response.data.filter((p: Player) => !currentPlayerIds.includes(p._id));
+            setAvailablePlayers(availablePlayers);
+        } catch (error) {
+            console.error("Erreur lors de la récupération des joueurs:", error);
+        }
+    };
+
+    const handleChangePlayer = async () => {
+        if (!selectedPlayer || !newPlayer) {
+            toastr.error('Erreur', 'Veuillez sélectionner les deux joueurs.', {timeOut: 3000});
+            return;
+        }
+
+        try {
+            const response = await api.put(`/session/${id}/changePlayer`, {
+                oldPlayerId: selectedPlayer,
+                newPlayerId: newPlayer
+            });
+
+            toastr.success('Succès', 'Le joueur a été remplacé.', {timeOut: 3000});
+            setShowChangePlayerModal(false);
+            setSelectedPlayer('');
+            setNewPlayer('');
+
+            // Redirect to the new/existing session
+            if (response.data.session._id !== id) {
+                navigate(`/session/${response.data.session._id}`);
+            } else {
+                fetchSession();
+            }
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                toastr.error('Erreur', error.response.data.message, {timeOut: 3000});
+            } else {
+                toastr.error('Erreur', 'Une erreur est survenue lors du changement de joueur.', {timeOut: 3000});
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (showChangePlayerModal) {
+            fetchAvailablePlayers();
+        }
+    }, [showChangePlayerModal]);
+
     return (
         <MobileLayout>
             {isLoading && <Loading/>}
@@ -320,18 +374,22 @@ const SessionDetail: React.FC = () => {
                                     }}><i className="fa fa-star"/> Ajouter une étoile
                                     </button>
                                 </div>
-                                {session?.games && session?.games.length > 0 ?
-                                    (
-
-                                        <div>
-                                            <button type="button" className="btn btn-warning btn-sm" style={{
+                                <div className="d-flex">
+                                    {session?.games && session?.games.length > 0 ?
+                                        (
+                                            <button type="button" className="btn btn-warning btn-sm me-2" style={{
                                                 fontSize: '0.7rem',
                                             }} onClick={() => {
                                                 setShowDeleteModal(true);
                                             }}>Annuler la dernière partie
                                             </button>
-                                        </div>
-                                    ) : null}
+                                        ) : null}
+                                    <button type="button" className="btn btn-primary btn-sm" style={{
+                                        fontSize: '0.7rem',
+                                    }} onClick={() => setShowChangePlayerModal(true)}>
+                                        Changer un joueur <i style={{fontSize: '0.6rem'}}>(By CryptoWeb ❤️)</i>
+                                    </button>
+                                </div>
                             </div>
                         ) : null
                 }
@@ -409,6 +467,71 @@ const SessionDetail: React.FC = () => {
                                 <div className={"m-1"}>
                                     <button className="btn btn-primary rounded-pill" onClick={addStar}>Ajouter</button>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
+                <Modal
+                    isOpen={showChangePlayerModal}
+                    onRequestClose={() => setShowChangePlayerModal(false)}
+                    style={{
+                        overlay: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                            zIndex: 9999
+                        },
+                        content: {height: 'calc(40%)'}
+                    }}
+                >
+                    <h3>Changer un joueur</h3>
+                    <div className="row">
+                        <div className="col-md-12">
+                            <h6>Joueur à remplacer</h6>
+                            <select 
+                                className="form-control" 
+                                value={selectedPlayer}
+                                onChange={(e) => setSelectedPlayer(e.target.value)}
+                            >
+                                <option value="">Sélectionner un joueur</option>
+                                {session?.players.map(player => (
+                                    <option 
+                                        key={player.player._id} 
+                                        value={player.player._id}
+                                    >
+                                        {`${player.player.firstname} ${player.player.lastname.charAt(0).toUpperCase()}.`}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <h6 className="mt-3">Nouveau joueur</h6>
+                            <select 
+                                className="form-control"
+                                value={newPlayer}
+                                onChange={(e) => setNewPlayer(e.target.value)}
+                            >
+                                <option value="">Sélectionner un joueur</option>
+                                {availablePlayers.map(player => (
+                                    <option 
+                                        key={player._id} 
+                                        value={player._id}
+                                    >
+                                        {`${player.firstname} ${player.lastname.charAt(0).toUpperCase()}.`}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <div className="d-flex justify-content-center mt-4">
+                                <button 
+                                    className="btn btn-danger me-2" 
+                                    onClick={() => setShowChangePlayerModal(false)}
+                                >
+                                    Annuler
+                                </button>
+                                <button 
+                                    className="btn btn-primary" 
+                                    onClick={handleChangePlayer}
+                                >
+                                    Confirmer
+                                </button>
                             </div>
                         </div>
                     </div>
