@@ -19,6 +19,30 @@ import SnowIco from "./Icons/seasons/SnowIco";
 import SunIco from "./Icons/seasons/SunIco";
 import SeasonTitle from "./SeasonTitle";
 import SelectPlayerComponent from "./Form/SelectPlayerComponent";
+import { Line } from 'react-chartjs-2';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+} from 'chart.js';
+
+// Register ChartJS components
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+);
+
+Modal.setAppElement('#root');
 
 const SessionDetail: React.FC = () => {
     const {id} = useParams<{ id: string }>();
@@ -325,6 +349,63 @@ const SessionDetail: React.FC = () => {
         }
     }, [showChangePlayerModal]);
 
+    const getLastFiveGamesScores = () => {
+        if (!session) return null;
+
+        // Get last 5 games
+        const lastGames = session.games.slice(-5);
+        const scores: { [key: string]: number[] } = {};
+
+
+        // Initialize scores for each player with empty arrays
+        session.players.forEach(player => {
+            scores[player.player.username] = [];
+        });
+
+        // Calculate cumulative scores for each game
+        lastGames.forEach((game, gameIndex) => {
+            
+            // For each player, get their current total and add this game's score
+            session.players.forEach(sessionPlayer => {
+                
+                const gamePlayer = game.players.find(
+                    p => p.player._id === sessionPlayer.player._id
+                );
+                
+                
+                if (gamePlayer) {
+                    const previousScore = scores[sessionPlayer.player.username][gameIndex - 1] || 0;  // Use 0 if it's the first game
+                    const newScore = previousScore + gamePlayer.score;
+                    scores[sessionPlayer.player.username][gameIndex] = newScore;
+                }
+            });
+        });
+
+        // Create labels based on the number of games from the end
+        const gameLabels = lastGames.map((_, idx) => {
+            const gamesFromEnd = lastGames.length - idx;
+            return `Partie N-${gamesFromEnd}`;
+        });
+
+        const chartData = {
+            labels: gameLabels,
+            datasets: Object.entries(scores).map(([username, scores], index) => ({
+                label: username,
+                data: scores,
+                borderColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF'
+                ][index % 5],
+                fill: false,
+                tension: 0.1
+            }))
+        };
+        return chartData;
+    };
+
     return (
         <MobileLayout>
             {isLoading && <Loading/>}
@@ -418,12 +499,24 @@ const SessionDetail: React.FC = () => {
                     </BootstrapModal.Header>
                     <BootstrapModal.Body>Êtes-vous sûr de vouloir annuler la dernière partie?</BootstrapModal.Body>
                     <BootstrapModal.Footer>
-                        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                            Annuler
-                        </Button>
-                        <Button variant="danger" onClick={() => setDeleteModalOpen()}>
-                            Confirmer
-                        </Button>
+                        <div className="d-flex justify-content-center w-100">
+                            <div className={"m-1"}>
+                                <button 
+                                    className="btn btn-danger rounded-pill" 
+                                    onClick={() => setShowDeleteModal(false)}
+                                >
+                                    Annuler
+                                </button>
+                            </div>
+                            <div className={"m-1"}>
+                                <button 
+                                    className="btn btn-primary rounded-pill" 
+                                    onClick={() => setDeleteModalOpen()}
+                                >
+                                    Confirmer
+                                </button>
+                            </div>
+                        </div>
                     </BootstrapModal.Footer>
                 </BootstrapModal>
                 <Modal
@@ -434,12 +527,39 @@ const SessionDetail: React.FC = () => {
                             backgroundColor: 'rgba(0, 0, 0, 0.75)',
                             zIndex: 9999
                         },
-                        content: {height: 'calc(75% - 100px)'}
+                        content: {
+                            height: '75%',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }
                     }}
                 >
-                    <h4>Tableau des scores</h4>
-
-
+                    <h4>Évolution des scores</h4>
+                    {getLastFiveGamesScores() && (
+                        <div style={{ flex: 1, position: 'relative' }}>
+                            <Line
+                                data={getLastFiveGamesScores()!}
+                                options={{
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'top' as const,
+                                        },
+                                        title: {
+                                            display: false,
+                                            text: 'Historique des 5 dernières parties'
+                                        }
+                                    },
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    }
+                                }}
+                            />
+                        </div>
+                    )}
                 </Modal>
                 <Modal isOpen={showAddStarModal} onRequestClose={handleAddStar}
                        style={{
@@ -521,22 +641,26 @@ const SessionDetail: React.FC = () => {
                                 selectOptions={getPlayerSelectOptions(availablePlayers)}
                             />
 
-                            <div className="d-flex justify-content-between mt-4">
-                                <button 
-                                    className="btn btn-danger" 
-                                    onClick={() => {
-                                        setShowChangePlayerModal(false);
-                                        setChangePlayerFormData({ players: ['', ''] });
-                                    }}
-                                >
-                                    Annuler
-                                </button>
-                                <button 
-                                    className="btn btn-primary" 
-                                    onClick={handleChangePlayer}
-                                >
-                                    Confirmer
-                                </button>
+                            <div className="d-flex justify-content-center mt-2">
+                                <div className={"m-1"}>
+                                    <button 
+                                        className="btn btn-danger rounded-pill" 
+                                        onClick={() => {
+                                            setShowChangePlayerModal(false);
+                                            setChangePlayerFormData({ players: ['', ''] });
+                                        }}
+                                    >
+                                        Annuler
+                                    </button>
+                                </div>
+                                <div className={"m-1"}>
+                                    <button 
+                                        className="btn btn-primary rounded-pill" 
+                                        onClick={handleChangePlayer}
+                                    >
+                                        Confirmer
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
