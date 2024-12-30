@@ -6,13 +6,16 @@ const winter2023 = [new Date(2023, 11, 22), new Date(2024, 2, 22, 0, 5, 0)];
 const spring2024 = [new Date(2024, 2, 22, 0, 5, 1), new Date(2024, 5, 19, 23, 59, 59)];
 const summer2024 = [new Date(2024, 5, 20), new Date(2024, 8, 21, 23, 59, 59)];
 const autumn2024 = [new Date(2024, 8, 22), new Date(2024, 11, 21, 23, 59, 59)];
-
+const winter2024 = [new Date(2024, 11, 22), new Date(2025, 2, 19, 23, 59, 59)];
+const spring2025 = [new Date(2025, 2, 20), new Date(2025, 5, 20, 23, 59, 59)];
 const seasons = [
     autumn2023,
     winter2023,
     spring2024,
     summer2024,
     autumn2024,
+    winter2024,
+    spring2025,
 ];
 
 export interface Session {
@@ -39,6 +42,8 @@ export enum Season {
     SPRING2024 = 'spring2024',
     SUMMER2024 = 'summer2024',
     AUTUMN2024 = 'autumn2024',
+    WINTER2024 = 'winter2024',
+    SPRING2025 = 'spring2025',
 }
 
 export const getSeasonLabel = (season: any) => {
@@ -53,6 +58,10 @@ export const getSeasonLabel = (season: any) => {
             return 'Été 2024';
         case Season.AUTUMN2024:
             return 'Automne 2024';
+        case Season.WINTER2024:
+            return 'Hiver 2024/2025';
+        case Season.SPRING2025:
+            return 'Printemps 2025';
     }
 }
 
@@ -68,6 +77,10 @@ export const getSeason = (date: Date) => {
         return 'summer2024';
     } else if (date >= autumn2024[0] && date <= autumn2024[1]) {
         return 'autumn2024';
+    } else if (date >= winter2024[0] && date <= winter2024[1]) {
+        return 'winter2024';
+    } else if (date >= spring2025[0] && date <= spring2025[1]) {
+        return 'spring2025'
     } else {
         return '';
     }
